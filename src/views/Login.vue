@@ -22,7 +22,7 @@
       <p>
         <span class="message">Авторизуйтесь, пожалуйста</span>
         <br/>
-        <span class="error"></span>
+        <span v-if="error">{{ error }}</span>
       </p>
     </div><!-- end of login-box-footer -->
   </div><!-- end of login-box -->
@@ -33,16 +33,34 @@ export default {
   name: 'Login',
   data: () => ({
     username: '',
-    password: ''
+    password: '',
+    error: ''
   }),
   methods: {
     login: function () {
       const username = this.username
       const password = this.password
+
+      if (!username) {
+        this.error = 'Введите логин'
+        return
+      }
+
+      if (!password) {
+        this.error = 'Введите пароль'
+        return
+      }
+
+      if (this.error) {
+        this.error = ''
+      }
+
       this.$store.dispatch('login', { username, password })
         .then(() => { this.$router.push('/') })
-        .catch(err => console.log(err))
-      // this.$router.push('/')).catch(err => console.log(err)
+        .catch((err) => {
+          console.log(err) // delete in production
+          this.error = 'Данное имя не найдено'
+        })
     }
   }
 }
