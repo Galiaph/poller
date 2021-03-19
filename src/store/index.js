@@ -6,7 +6,7 @@ export default createStore({
   state: {
     status: '',
     token: localStorage.getItem('token') || '',
-    expires: Number(localStorage.getItem('expires')) || null,
+    expires: Number(localStorage.getItem('expires')) || 0,
     userName: localStorage.getItem('user_name') || '',
     login: localStorage.getItem('login') || ''
   },
@@ -27,7 +27,7 @@ export default createStore({
     logout (state) {
       state.status = ''
       state.token = ''
-      state.expires = ''
+      state.expires = 0
       state.userName = ''
       state.login = ''
     }
@@ -67,11 +67,11 @@ export default createStore({
   },
   getters: {
     isLoggedIn: state => {
-      if (state.token && state.expires && (new Date().getTime() > (state.expires - 300) * 1000)) {
-        this.$store.dispatch('logout')
+      if (state.token === '' || state.expires === 0 || (new Date().getTime() > (state.expires - 300) * 1000)) {
+        return false
       }
 
-      return !!state.token
+      return true
     },
     authStatus: state => state.status
   },
