@@ -1,0 +1,68 @@
+.window
+{
+  position: absolute;
+  background: white;
+  border: solid 2px gray;
+  box-shadow: 6px 6px 10px 0px #707070;
+  margin: 1px;
+  padding: 0.5em;
+
+  z-index: 10;
+}
+
+.window.shy
+{
+  border: solid 1px gray;
+  box-shadow: 4px 4px 10px 0px #707070;
+  margin: 1px;
+  padding: 0.4em;
+}
+
+.window-header
+{
+  color: white;
+  font-weight: bold;
+  padding: 0.3em;
+  background: rgb(114, 152, 195);  
+  width: 100%;
+}
+
+.window.shy .window-header
+{
+  background: rgb(130,170, 210);
+}
+
+.window.shy .window-header
+{
+  font-weight: normal;
+}
+
+.window-header .title
+{
+}
+
+.window-header .close
+{
+  cursor: pointer;
+}
+
+.window-header-spacer
+{
+  cursor: move;
+}
+
+.window-body
+{
+  padding: 0.5em;
+  overflow-y: scroll;
+}
+
+.window-header .title strong
+{
+  color: yellow;
+}
+
+.window-menu-link
+{
+  cursor: pointer;
+}

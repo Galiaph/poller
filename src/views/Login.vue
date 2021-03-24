@@ -58,7 +58,6 @@ export default {
       this.$store.dispatch('login', { username, password })
         .then(() => { this.$router.push('/') })
         .catch((err) => {
-          console.log(err) // delete in production
           this.error = 'Данное имя не найдено'
         })
     }

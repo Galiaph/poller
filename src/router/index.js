@@ -1,12 +1,12 @@
 import { createRouter, createWebHistory } from 'vue-router'
 import store from '../store/index.js'
-import Home from '../views/Home.vue'
+import Main from '../views/Main.vue'
 
 const routes = [
   {
     path: '/',
-    name: 'Home',
-    component: Home,
+    name: 'Main',
+    component: Main,
     meta: {
       requiresAuth: true
     }

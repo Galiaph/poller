@@ -45,7 +45,6 @@ export default createStore({
             const expires = moment(resp.data.expires, 'YYYY-MM-DD HH:mm:ssZ').unix()
             const userName = resp.data.cn
             const login = resp.data.login
-            console.log(resp.data.expires) // delete in production
             localStorage.setItem('token', token)
             localStorage.setItem('expires', expires)
             localStorage.setItem('user_name', userName)
@@ -62,6 +61,14 @@ export default createStore({
             localStorage.removeItem('login')
             reject(err)
           })
+      })
+    },
+    logout ({ commit }) {
+      return new Promise((resolve, reject) => {
+        commit('logout')
+        localStorage.removeItem('token')
+        delete axios.defaults.headers.common.Authorization
+        resolve()
       })
     }
   },
