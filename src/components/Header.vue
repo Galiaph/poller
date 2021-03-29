@@ -54,6 +54,7 @@
              </form>
            </div>
            <div id="logout-link" class="main-menu-item" align="right">
+             <img :src="login_img" width="16" height="16">
              <a @click="logout" href=""><img src="/images/site/turnoff.png" style="margin-top: 5px" title="Выход"></a>
            </div>
          </div>
@@ -66,6 +67,19 @@
 <script>
 export default {
   name: 'Header',
+  computed: {
+    login_img () {
+      const login = localStorage.getItem('login')
+      const token = encodeURIComponent(localStorage.getItem('token'))
+        .replace(/\\'/g, '%27')
+        // .replace(/\\-/g, '%2D')
+        // .replace(/\\_/g, '%5F')
+        // .replace(/\\./g, '%2E')
+        // .replace(/\\!/g, '%21')
+        // .replace(/\\~/g, '%7E')
+      return 'https://worker-darsan.mol.net.ua/worker/' + login + '/avatar?darsan2=' + token
+    }
+  },
   methods: {
     logout: function () {
       this.$store.dispatch('logout').then(() => { this.$router.push('/login') })

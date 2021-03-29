@@ -5,11 +5,11 @@
     </div><!-- end of login-box-header -->
     <div id="login-box-body">
       <form name="main-login-form" @submit.prevent="login">
-        <div class="text">
+        <div class="tex">
           <label>Имя пользователя</label>
           <input v-model="username" type="text" autofocus="1" />
         </div>
-        <div class="text">
+        <div class="tex">
           <label>Пароль</label>
           <input v-model="password" type="password"/>
         </div>
@@ -57,6 +57,7 @@ export default {
 
       this.$store.dispatch('login', { username, password })
         .then(() => { this.$router.push('/') })
+        // eslint-disable-next-line handle-callback-err
         .catch((err) => {
           this.error = 'Данное имя не найдено'
         })
@@ -65,7 +66,16 @@ export default {
 }
 </script>
 
-<style>
+<style scoped>
+body {
+  margin: 8px;
+}
+
+p {
+  margin-top: 16px;
+  margin-bottom: 16px;
+}
+
 div#login-box {
   margin: 10% 25%;
   border: 1px solid #7298c3;
@@ -95,7 +105,7 @@ div#login-box-body {
 div#login-box-body div {
   height: 28px;
 }
-.text label {
+.tex label {
   display: block;
   float: left;
   width: 35%;
@@ -106,5 +116,13 @@ div#login-box-body div {
   margin-left: 35%;
   padding-left: 1%;
   text-align: left;
+}
+
+input {
+  padding: 1px 2px;
+}
+
+.formsubmit input {
+  padding: 1px 6px;
 }
 </style>

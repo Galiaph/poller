@@ -1,5 +1,5 @@
 <template>
-  <div class="right-bar">
+  <div class="right-bar" id="right-bar">
   </div>
 </template>
 

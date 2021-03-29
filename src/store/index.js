@@ -11,18 +11,19 @@ export default createStore({
     login: localStorage.getItem('login') || ''
   },
   mutations: {
-    auth_request (state) {
-      state.status = 'loading'
-    },
-    auth_success (state, token, expires, userName, login) {
+    auth_success (state, payload) {
       state.status = 'success'
-      state.token = token
-      state.expires = expires
-      state.userName = userName
-      state.login = login
+      state.token = payload.token
+      state.expires = payload.expires
+      state.userName = payload.userName
+      state.login = payload.login
+      localStorage.setItem('token', state.token)
+      localStorage.setItem('expires', state.expires)
     },
     auth_error (state) {
       state.status = 'error'
+      localStorage.removeItem('token')
+      localStorage.removeItem('expires')
     },
     logout (state) {
       state.status = ''
@@ -30,12 +31,13 @@ export default createStore({
       state.expires = 0
       state.userName = ''
       state.login = ''
+      localStorage.removeItem('token')
+      localStorage.removeItem('expires')
     }
   },
   actions: {
     login ({ commit }, user) {
       return new Promise((resolve, reject) => {
-        commit('auth_request')
         const formData = new FormData()
         formData.append('login', user.username)
         formData.append('password', user.password)
@@ -45,20 +47,12 @@ export default createStore({
             const expires = moment(resp.data.expires, 'YYYY-MM-DD HH:mm:ssZ').unix()
             const userName = resp.data.cn
             const login = resp.data.login
-            localStorage.setItem('token', token)
-            localStorage.setItem('expires', expires)
-            localStorage.setItem('user_name', userName)
-            localStorage.setItem('login', login)
             axios.defaults.headers.common.Authorization = 'Darsan2 ' + token
-            commit('auth_success', token, expires, userName, login)
+            commit('auth_success', { token, expires, userName, login })
             resolve(resp)
           })
           .catch(err => {
             commit('auth_error')
-            localStorage.removeItem('token')
-            localStorage.removeItem('expires')
-            localStorage.removeItem('user_name')
-            localStorage.removeItem('login')
             reject(err)
           })
       })

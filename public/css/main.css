@@ -422,6 +422,7 @@ div#site-search input[type="text"] {
     margin-top: 5px;
     display: block;
     float: left;
+    padding: 0;
     background-color: #7298c3;
     border: 1px solid #FFF;
     height: 14px;
@@ -863,7 +864,7 @@ table.nice-table {
 table.nice-table tr
 {
   border: 1px solid #7298c3;
-  background-image: linear-gradient(top, rgb(250,250,250) 0%, rgb(215,237,245) 100%);
+  background-image: linear-gradient(to left top, rgb(250,250,250) 0%, rgb(215,237,245) 100%);
   background-image: -moz-linear-gradient(top, rgb(250,250,250) 0%, rgb(215,237,245) 100%);
   background-image: -webkit-linear-gradient(top, rgb(250,250,250) 0%, rgb(215,237,245) 100%);
   padding: 0;
