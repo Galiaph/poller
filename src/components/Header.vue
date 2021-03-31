@@ -69,20 +69,20 @@ export default {
   name: 'Header',
   computed: {
     login_img () {
-      const login = localStorage.getItem('login')
-      const token = encodeURIComponent(localStorage.getItem('token'))
+      const token = encodeURIComponent(this.$store.getters.getToken)
         .replace(/\\'/g, '%27')
         // .replace(/\\-/g, '%2D')
         // .replace(/\\_/g, '%5F')
         // .replace(/\\./g, '%2E')
         // .replace(/\\!/g, '%21')
         // .replace(/\\~/g, '%7E')
-      return 'https://worker-darsan.mol.net.ua/worker/' + login + '/avatar?darsan2=' + token
+      return 'https://worker-darsan.mol.net.ua/worker/' + this.$store.getters.getLogin + '/avatar?darsan2=' + token
     }
   },
   methods: {
-    logout: function () {
-      this.$store.dispatch('logout').then(() => { this.$router.push('/login') })
+    logout: async function () {
+      await this.$store.dispatch('logout')
+      this.$router.push('/login')
     }
   }
 }

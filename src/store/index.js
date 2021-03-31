@@ -36,34 +36,30 @@ export default createStore({
     }
   },
   actions: {
-    login ({ commit }, user) {
-      return new Promise((resolve, reject) => {
-        const formData = new FormData()
-        formData.append('login', user.username)
-        formData.append('password', user.password)
-        axios({ url: 'https://darsan.mol.net.ua/token', data: formData, method: 'POST' })
-          .then(resp => {
-            const token = resp.data.token
-            const expires = moment(resp.data.expires, 'YYYY-MM-DD HH:mm:ssZ').unix()
-            const userName = resp.data.cn
-            const login = resp.data.login
-            axios.defaults.headers.common.Authorization = 'Darsan2 ' + token
-            commit('auth_success', { token, expires, userName, login })
-            resolve(resp)
-          })
-          .catch(err => {
-            commit('auth_error')
-            reject(err)
-          })
+    async login ({ commit }, user) {
+      const formData = new FormData()
+      formData.append('login', user.username)
+      formData.append('password', user.password)
+      const resp = await axios.post(
+        'https://darsan.mol.net.ua/token',
+        formData
+      )
+      const token = resp.data.token
+      const expires = moment(resp.data.expires, 'YYYY-MM-DD HH:mm:ssZ').unix()
+      const userName = resp.data.cn
+      const login = resp.data.login
+      axios.defaults.headers.common.Authorization = 'Darsan2 ' + token
+      commit('auth_success', {
+        token,
+        expires,
+        userName,
+        login
       })
     },
-    logout ({ commit }) {
-      return new Promise((resolve, reject) => {
-        commit('logout')
-        localStorage.removeItem('token')
-        delete axios.defaults.headers.common.Authorization
-        resolve()
-      })
+    async logout ({ commit }) {
+      delete axios.defaults.headers.common.Authorization
+      commit('logout')
+      localStorage.removeItem('token')
     }
   },
   getters: {
@@ -74,7 +70,9 @@ export default createStore({
 
       return true
     },
-    authStatus: state => state.status
+    authStatus: state => state.status,
+    getToken: state => state.token,
+    getLogin: state => state.login
   },
   modules: {
   }

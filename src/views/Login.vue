@@ -22,45 +22,53 @@
       <p>
         <span class="message">Авторизуйтесь, пожалуйста</span>
         <br/>
-        <span v-if="error">{{ error }}</span>
       </p>
     </div><!-- end of login-box-footer -->
   </div><!-- end of login-box -->
 </template>
 
 <script>
+import { useToast } from 'vue-toastification'
+
 export default {
   name: 'Login',
   data: () => ({
     username: '',
-    password: '',
-    error: ''
+    password: ''
   }),
   methods: {
-    login: function () {
+    login: async function () {
       const username = this.username
       const password = this.password
 
+      const toast = useToast()
+
       if (!username) {
-        this.error = 'Введите логин'
+        toast.info('Введите логин', { timeout: 3000 })
+        // this.error = 'Введите логин'
         return
       }
 
       if (!password) {
-        this.error = 'Введите пароль'
+        toast.info('Введите пароль', { timeout: 3000 })
+        // this.error = 'Введите пароль'
         return
       }
 
-      if (this.error) {
-        this.error = ''
-      }
+      // if (this.error) {
+      //   this.error = ''
+      // }
 
-      this.$store.dispatch('login', { username, password })
-        .then(() => { this.$router.push('/') })
-        // eslint-disable-next-line handle-callback-err
-        .catch((err) => {
-          this.error = 'Данное имя не найдено'
+      try {
+        await this.$store.dispatch('login', {
+          username,
+          password
         })
+        this.$router.push('/')
+      } catch (err) {
+        this.$store.commit('auth_error')
+        toast.error(err.response.data, { timeout: 3000 })
+      }
     }
   }
 }
