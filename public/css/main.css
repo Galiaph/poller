@@ -238,7 +238,7 @@ div.group-box-selected-right div.group-item-info {
 }
 div.group-actions div {
     float: left;
-    margin: 4px 1px 0 1px;
+    margin: 2px 2px 0 1px;
 }
 div.group-body {
     min-height: 32px;
@@ -296,9 +296,15 @@ table#item-table {
     width: 100%;
 }
 table#item-table tr {
-/*    border-bottom: 1px solid #7298c3; */
+    /*border: 1px solid #97B2D1;*/
+    /*border-radius: 6px;*/
+    /*-webkit-border-radius: 6px;*/
+    /*-moz-border-radius: 6px;*/
+    /*-khtml-border-radius: 6px;*/
+    /*display: block;*/
     background: transparent url(/images/site/i_entry_bkg.png) repeat-x scroll left top;
     padding: 0;
+    margin-right: 2px;
     height: 26px;
 }
 table#item-table thead td {
@@ -308,11 +314,13 @@ table#item-table thead td.non-sorted {
     cursor: pointer;
     background: transparent url(/images/site/non-sorted.png) no-repeat 4px 12px;
     padding-left: 18px;
+    padding-top: 5px;
 }
 table#item-table thead td.sorted-asc {
     background: transparent url(/images/site/sorted-asc.png) no-repeat 4px 12px;
     cursor: pointer;
     padding-left: 18px;
+    padding-top: 5px;
 }
 table#item-table thead td.sorted-desc {
     background: transparent url(/images/site/sorted-desc.png) no-repeat 4px 12px;
@@ -321,12 +329,12 @@ table#item-table thead td.sorted-desc {
 }
 td.item-box-left-stub {
     height: 26px;
-    width: 5px;
+    width: 3px;
     background: transparent url(/images/site/i_entry_left.png) no-repeat scroll left top;
 }
 td.item-box-right-stub {
     height: 26px;
-    width: 5px;
+    width: 3px;
     background: transparent url(/images/site/i_entry_right.png) no-repeat scroll left top;
 }
 td.item-box-image img {
@@ -334,6 +342,7 @@ td.item-box-image img {
 }
 td.item-box-actions {
     width: 48px;
+    padding: 0px;
 }
 /*table#item-table tr.even {
     background-color: #ECF0F3;
