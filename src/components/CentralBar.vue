@@ -32,47 +32,7 @@
           </tr>
           </thead>
           <tbody>
-          <tr v-for="item in devicesBar" :key="item">
-            <td class="item-box-left-stub" style=""></td>
-            <td class="item-box-image" style="position: relative">
-              <img src="/images/site/obj_ok.png">
-            </td>
-            <td width="30px"></td>
-            <td class="item-box-image">
-              <img class="tooltip" src="/images/site/picture.png" title="2015-04-15 12:40:52<br/><img src='/device/photo/654' width='200'/>" onclick="showPhoto(654)">
-            </td>
-            <td title="4%" key="4">
-              <div class="cpu-bar">
-                <a class="details-cpu" href="/device/graph2/40397f2f-1a51-4eab-8e82-6676879bd3d2">
-                  <div class="cpu-bar-progress" style="width: 4%"></div>
-                </a>
-              </div>
-            </td>
-            <td class="item-box-title">
-              <a class="details-link " href="/device/details/8f7e52e2-1e45-4141-b265-b4907ae48434" :title="item.name">{{ item.name }}</a>
-            </td>
-            <td class="item-box-data" title="Время непрерывной работы">
-              <span class="ok">39 д.</span>
-            </td>
-            <td class="item-box-data">
-              {{ item.type }}
-            </td>
-            <td class="item-box-data device-ip">
-              <a :href="'telnet://' + item.ip">{{ item.ip }}</a>
-            </td>
-            <td class="item-box-data device-vlan" align="right">
-              {{ item.access_vlan }}
-            </td>
-            <td class="item-box-data device-vlan2" align="right">
-              <!--0-->
-            </td>
-            <td class="item-box-actions">
-              <a class="modal" title="Свойства" href="/device/edit/8f7e52e2-1e45-4141-b265-b4907ae48434"><img src="/images/site/edit_n.png"></a>
-              <a class="modal" title="Разрешения" href="/device/permedit/8f7e52e2-1e45-4141-b265-b4907ae48434/a8975824-5473-447a-b053-4502c9ff303c"><img src="/images/site/perms_n.png"></a>
-              <a class="modal" title="Удалить" href="/device/del/8f7e52e2-1e45-4141-b265-b4907ae48434"><img src="/images/site/delete_n.png"></a>
-            </td>
-            <td class="item-box-right-stub"></td>
-          </tr>
+            <CentralRow v-for="item in devicesBar" :data="item" :key="item" />
           </tbody>
         </table>
       </div>
@@ -82,9 +42,13 @@
 
 <script>
 // import axios from 'axios'
+import CentralRow from './element/CentralRow.vue'
 
 export default {
   name: 'CentralBar',
+  components: {
+    CentralRow
+  },
   data: () => ({
   }),
   props: {

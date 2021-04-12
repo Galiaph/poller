@@ -39,7 +39,15 @@ export default {
     },
     getDevices: async function () {
       const resp = await axios.get(`https://device-darsan.mol.net.ua/switch?query=node IN (${this.selecteNode})`)
-      this.Devices = resp.data
+      this.Devices = resp.data.sort((a, b) => {
+        if (a.name > b.name) {
+          return 1
+        } else if (a.name < b.name) {
+          return -1
+        }
+
+        return 0
+      })
     }
   },
   mounted: async function () {
