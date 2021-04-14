@@ -32,28 +32,53 @@
           </tr>
           </thead>
           <tbody>
-            <CentralRow v-for="item in devicesBar" :data="item" :key="item" />
+            <CentralRow v-for="item in devicesBar" :data="item" :key="item" @selected="createWindow" />
           </tbody>
         </table>
       </div>
     </div>
   </div>
+  <template v-for="block in windows.content" :key="block">
+    <component :is="block.component" @clickClose="closeWindow(block)" :block="block" :pageX="block.pageX" :pageY="block.pageY" :title="block.title"></component>
+  </template>
 </template>
 
 <script>
 // import axios from 'axios'
 import CentralRow from './element/CentralRow.vue'
+import Window from './element/Window.vue'
 
 export default {
   name: 'CentralBar',
   components: {
-    CentralRow
+    CentralRow,
+    Window
   },
   data: () => ({
+    windows: {
+      content: []
+    }
   }),
   props: {
     devicesBar: Object,
     node: Number
+  },
+  methods: {
+    createWindow: function (event) {
+      console.log(event)
+      this.windows.content.push({
+        component: 'Window',
+        title: 'Client',
+        pageX: event.clientX + 'px',
+        pageY: event.clientY + 'px'
+      })
+    },
+    closeWindow: function (item) {
+      const index = this.windows.content.indexOf(item)
+      if (index > -1) {
+        this.windows.content.splice(index, 1)
+      }
+    }
   }
   // mounted: async function () {
   //   try {

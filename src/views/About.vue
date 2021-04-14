@@ -1,8 +1,10 @@
 <template>
   <div class="about">
     <h1>This is an about page</h1>
-    <button @click="visibleFormCrudUpdate(true)">test</button>
-    <Window :active="visibleFormCrud" title="Client 1" @clickClose="visibleFormCrudUpdate(false)" />
+    <button @click="createWindow">test</button>
+    <template v-for="block in windows.content" :key="block">
+      <component :is="block.component" :block="block" @clickClose="closeWindow(block)" :active="block.active" :title="block.title"></component>
+    </template>
   </div>
 </template>
 
@@ -12,14 +14,26 @@ import Window from '../components/element/Window.vue'
 export default {
   name: 'About',
   data: () => ({
-    visibleFormCrud: false
+    windows: {
+      content: []
+    },
+    count: 1
   }),
   components: {
     Window
   },
   methods: {
-    visibleFormCrudUpdate: function (state) {
-      this.visibleFormCrud = state
+    createWindow: function () {
+      this.windows.content.push({
+        component: 'Window',
+        title: 'Client'
+      })
+    },
+    closeWindow: function (item) {
+      const index = this.windows.content.indexOf(item)
+      if (index > -1) {
+        this.windows.content.splice(index, 1)
+      }
     }
   }
 }

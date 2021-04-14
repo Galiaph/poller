@@ -57,7 +57,7 @@ export default {
 }
 </script>
 
-<style lang="scss">
+<style>
 ul {
   margin: 0;
   padding: 0;

@@ -17,7 +17,7 @@
     </td>
     <td v-else></td>
     <td class="item-box-title">
-      <a class="details-link " href="/about" :title="data.name">{{ data.name }}</a>
+      <a class="details-link " href="" @click.prevent="select($event)" :title="data.name">{{ data.name }}</a>
     </td>
     <td class="item-box-data" title="Время непрерывной работы">
       <span class="off" v-if="data.state === 'disabled'">---</span>
@@ -67,6 +67,9 @@ export default {
     }
   },
   methods: {
+    select: function (event) {
+      this.$emit('selected', event)
+    },
     zeroPad: function (number, digits) {
       var num = number + ''
       while (num.length < digits) {
@@ -107,5 +110,6 @@ export default {
 }
 </script>
 
-<style scoped>
+<style>
+
 </style>

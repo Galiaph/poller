@@ -201,6 +201,7 @@ div.group-box span.group-title a:hover,
 div.group-box div.group-title a:hover {
     text-decoration: underline;
     color: #7298c3;
+    cursor: pointer;
 }
 div.group-box-right span.group-title a:active,
 div.group-box-right span.group-title a:visited,
