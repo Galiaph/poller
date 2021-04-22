@@ -19,6 +19,8 @@ export default createStore({
       state.login = payload.login
       localStorage.setItem('token', state.token)
       localStorage.setItem('expires', state.expires)
+      localStorage.getItem('user_name', state.userName)
+      localStorage.setItem('login', state.login)
     },
     auth_error (state) {
       state.status = 'error'
@@ -59,7 +61,7 @@ export default createStore({
     async logout ({ commit }) {
       delete axios.defaults.headers.common.Authorization
       commit('logout')
-      localStorage.removeItem('token')
+      // localStorage.removeItem('token')
     }
   },
   getters: {

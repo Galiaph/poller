@@ -45,7 +45,8 @@
 </template>
 
 <script>
-import moment from 'moment'
+// import moment from 'moment'
+import { formatUptime, formatUptimeFromStart } from './timeFunc.js'
 
 export default {
   name: 'CentralRow',
@@ -54,7 +55,7 @@ export default {
   },
   computed: {
     upTime () {
-      return this.data.down ? this.formatUptimeFromStart(this.data.down_from, true) : this.formatUptime(this.data.uptime, true, (this.data.uptime > 864000))
+      return this.data.down ? formatUptimeFromStart(this.data.down_from, true) : formatUptime(this.data.uptime, true, (this.data.uptime > 864000))
     },
     state () {
       if (this.data.state === 'disabled') {
@@ -69,43 +70,43 @@ export default {
   methods: {
     select: function (event) {
       this.$emit('selected', event)
-    },
-    zeroPad: function (number, digits) {
-      var num = number + ''
-      while (num.length < digits) {
-        num = '0' + num
-      }
-      return num
-    },
-    formatUptime: function (seconds, withoutSeconds, withoutHours) {
-      const numdays = Math.floor(seconds / 86400)
-      const numhours = Math.floor((seconds % 86400) / 3600)
-      const numminutes = Math.floor(((seconds % 86400) % 3600) / 60)
-      const numseconds = Math.floor((seconds % 3600) % 60)
-
-      // let res = '' + this.zeroPad(numminutes, 2)
-      let res = ''
-
-      if (!withoutHours) {
-        res = this.zeroPad(numhours, 2) + ':'
-        res += this.zeroPad(numminutes, 2)
-      }
-
-      if (!withoutSeconds) {
-        res += ':' + this.zeroPad(numseconds, 2)
-      }
-
-      if (numdays) {
-        res = numdays + 'д ' + res
-      }
-
-      return res
-    },
-    formatUptimeFromStart: function (datetime, withoutSeconds) {
-      const a = moment()
-      const b = moment(datetime)
-      return this.formatUptime(a.diff(b, 'seconds'), withoutSeconds, (this.data.uptime > 864000)) // 86400000
     }
+    // zeroPad: function (number, digits) {
+    //   var num = number + ''
+    //   while (num.length < digits) {
+    //     num = '0' + num
+    //   }
+    //   return num
+    // },
+    // formatUptime: function (seconds, withoutSeconds, withoutHours) {
+    //   const numdays = Math.floor(seconds / 86400)
+    //   const numhours = Math.floor((seconds % 86400) / 3600)
+    //   const numminutes = Math.floor(((seconds % 86400) % 3600) / 60)
+    //   const numseconds = Math.floor((seconds % 3600) % 60)
+
+    //   // let res = '' + this.zeroPad(numminutes, 2)
+    //   let res = ''
+
+    //   if (!withoutHours) {
+    //     res = this.zeroPad(numhours, 2) + ':'
+    //     res += this.zeroPad(numminutes, 2)
+    //   }
+
+    //   if (!withoutSeconds) {
+    //     res += ':' + this.zeroPad(numseconds, 2)
+    //   }
+
+    //   if (numdays) {
+    //     res = numdays + 'д ' + res
+    //   }
+
+    //   return res
+    // },
+    // formatUptimeFromStart: function (datetime, withoutSeconds) {
+    //   const a = moment()
+    //   const b = moment(datetime)
+    //   return this.formatUptime(a.diff(b, 'seconds'), withoutSeconds) // 86400000
+    // }
   }
 }
 </script>

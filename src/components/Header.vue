@@ -70,12 +70,6 @@ export default {
   computed: {
     login_img () {
       const token = encodeURIComponent(this.$store.getters.getToken)
-        .replace(/\\'/g, '%27')
-        // .replace(/\\-/g, '%2D')
-        // .replace(/\\_/g, '%5F')
-        // .replace(/\\./g, '%2E')
-        // .replace(/\\!/g, '%21')
-        // .replace(/\\~/g, '%7E')
       return 'https://worker-darsan.mol.net.ua/worker/' + this.$store.getters.getLogin + '/avatar?darsan2=' + token
     }
   },

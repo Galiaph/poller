@@ -4,7 +4,7 @@
         class="vue-window-modal"
         :style="{top, left, width, height}">
         <div class="vue-window-modal-header">
-            <table>
+            <table style="margin: 0px;">
               <tbody>
                 <tr>
                   <td class="screen">
@@ -13,7 +13,7 @@
                     </div>
                   </td>
                   <td class="window-menu-link" style="width: 0px;"></td>
-                  <td class="title" style="width: 4.8px;">{{ title }}</td>
+                  <td class="title">{{ `${data.name} - ${data.type} ${data.ip}` }}</td>
                   <td :id="windowId + '-' + 'header'" class="window-header-spacer" style="width: 828px;"></td>
                   <td class="close" @click.stop="$emit('clickClose')"></td>
                 </tr>
@@ -24,77 +24,55 @@
         <div class="window-body" style="height: 205px;">
           <table class="device-details">
             <tbody>
-                <tr>
-                    <td colspan="26">
-                        <div id="device-common-info">
-                            <div class="status-ok">43 д.</div>
-                        </div>
-                    </td>
+              <tr>
+                <td colspan="26">
+                  <div id="device-common-info">
+                    <div :class="statusDev()">{{ data.state === 'disabled' ? '365 д.' : upTime() }}</div>
+                  </div>
+                </td>
                 </tr>
                 <tr id="device-port-info">
-                    <td class="device-port-cell">
-                        <div class="device-port-entity">
-                            <div class="device-port-num drop-down-win">
-                                <a class="graph-link port-access" href="[% '/device/graph/' _ fields.device_id _ '/' _ loop.count %]" title="item.tag">1</a>
-                                <!-- <a href="[%c.config.billing_client%][%uid%]" title="a[%uid%]" class="ok" target="_blank">&#x25CF;</a>
-                                <a class="triangle" href="/device/details/[%link.id%]" title="[%link.ip _ link.comment%]">&#x25B3;</a> -->
-                            </div>
-                            <div class="device-port-items-count drop-down-win">
-                                <a class="macs-count" href="[% '/device/currmacs_gpon/' _ fields.device_id _ '/' _ loop.count %]">2</a>
-                                <!-- <a class="macs-count" href="[% '/device/currmacs/' _ fields.device_id _ '/' _ loop.count %]">[% item.number -%]</a> -->
-                            </div>
-                            <div class="device-port-olditems-count drop-down-win">
-                                <a class="oldmacs-count" href="[% '/device/oldmacs/' _ fields.device_id _ '/' _ loop.count %]">3</a>
-                            </div>
+                  <td class="device-port-cell" v-for="index in ports.length" :key="index">
+                    <template v-if="index % 2">
+                      <div class="device-port-entity">
+                        <div class="device-port-num drop-down-win">
+                          <a class="graph-link" :class="portStatus(index - 1)" href="[% '/device/graph/' _ fields.device_id _ '/' _ loop.count %]" :title="index">{{ index }}</a>
+                          <!-- <a href="[%c.config.billing_client%][%uid%]" title="a[%uid%]" class="ok" target="_blank">&#x25CF;</a>
+                          <a class="triangle" href="/device/details/[%link.id%]" title="[%link.ip _ link.comment%]">&#x25B3;</a> -->
                         </div>
-                        <div class="device-port-entity">
-                          <div class="device-port-olditems-count drop-down-win">
-                              <a class="oldmacs-count" href="[% '/device/oldmacs/' _ fields.device_id _ '/' _ loop.count %]">7</a>
-                          </div>
-                          <div class="device-port-items-count drop-down-win">
-                              <a class="macs-count" href="[% '/device/currmacs/' _ fields.device_id _ '/' _ loop.count %]">8</a>
-                          </div>
-                          <div class="device-port-num drop-down-win">
-                              <a class="graph-link port-trunk" href="[% '/device/graph/' _ fields.device_id _ '/' _ loop.count %]" title="[% item.tag %]">2</a>
-                          </div>
-                      </div>
-                    </td>
-                    <td class="device-port-cell">
-                        <div class="device-port-entity">
-                            <div class="device-port-num drop-down-win">
-                                <a class="graph-link port-access" href="[% '/device/graph/' _ fields.device_id _ '/' _ loop.count %]" title="item.tag">1</a>
-                                <!-- <a href="[%c.config.billing_client%][%uid%]" title="a[%uid%]" class="ok" target="_blank">&#x25CF;</a>
-                                <a class="triangle" href="/device/details/[%link.id%]" title="[%link.ip _ link.comment%]">&#x25B3;</a> -->
-                            </div>
-                            <div class="device-port-items-count drop-down-win">
-                                <a class="macs-count" href="[% '/device/currmacs_gpon/' _ fields.device_id _ '/' _ loop.count %]">2</a>
-                                <!-- <a class="macs-count" href="[% '/device/currmacs/' _ fields.device_id _ '/' _ loop.count %]">[% item.number -%]</a> -->
-                            </div>
-                            <div class="device-port-olditems-count drop-down-win">
-                                <a class="oldmacs-count" href="[% '/device/oldmacs/' _ fields.device_id _ '/' _ loop.count %]">3</a>
-                            </div>
+                        <div class="device-port-items-count drop-down-win">
+                          <a class="macs-count" href="[% '/device/currmacs_gpon/' _ fields.device_id _ '/' _ loop.count %]">{{ currentMacsCount(index) }}</a>
+                          <!-- <a class="macs-count" href="[% '/device/currmacs/' _ fields.device_id _ '/' _ loop.count %]">[% item.number -%]</a> -->
                         </div>
-                        <div class="device-port-entity">
-                          <div class="device-port-olditems-count drop-down-win">
-                              <a class="oldmacs-count" href="[% '/device/oldmacs/' _ fields.device_id _ '/' _ loop.count %]">7</a>
-                          </div>
-                          <div class="device-port-items-count drop-down-win">
-                              <a class="macs-count" href="[% '/device/currmacs/' _ fields.device_id _ '/' _ loop.count %]">8</a>
-                          </div>
-                          <div class="device-port-num drop-down-win">
-                              <a class="graph-link port-trunk" href="[% '/device/graph/' _ fields.device_id _ '/' _ loop.count %]" title="[% item.tag %]">2</a>
-                          </div>
+                        <div class="device-port-olditems-count drop-down-win">
+                          <a class="oldmacs-count" href="[% '/device/oldmacs/' _ fields.device_id _ '/' _ loop.count %]">3</a>
+                        </div>
                       </div>
-                    </td>
+                      <div class="device-port-entity">
+                        <div class="device-port-olditems-count drop-down-win">
+                          <a class="oldmacs-count" href="[% '/device/oldmacs/' _ fields.device_id _ '/' _ loop.count %]">7</a>
+                        </div>
+                        <div class="device-port-items-count drop-down-win">
+                          <a class="macs-count" href="[% '/device/currmacs/' _ fields.device_id _ '/' _ loop.count %]">{{ currentMacsCount(index + 1) }}</a>
+                        </div>
+                        <div class="device-port-num drop-down-win">
+                          <a class="graph-link" :class="portStatus(index)" href="[% '/device/graph/' _ fields.device_id _ '/' _ loop.count %]" :title="index">{{ index + 1 }}</a>
+                        </div>
+                      </div>
+                    </template>
+                  </td>
                 </tr>
             </tbody>
-            </table>
+          </table>
         </div>
         <!-- <slot name="default"></slot> -->
     </div>
 </template>
 
 <script>
+import axios from 'axios'
+import { formatUptime, formatUptimeFromStart } from './timeFunc.js'
+
 export default {
   name: 'Window',
   props: {
@@ -107,7 +85,6 @@ export default {
       type: String,
       default: '0px'
     },
-    title: String,
     width: {
       type: String,
       default: '850px'
@@ -115,6 +92,10 @@ export default {
     height: {
       type: String,
       default: '245px'
+    },
+    switch: {
+      type: Number,
+      default: null
     }
   },
   data () {
@@ -126,10 +107,44 @@ export default {
         return one + two + three
       })(),
       top: this.pageY,
-      left: this.pageX
+      left: this.pageX,
+      data: {}
+    }
+  },
+  computed: {
+    ports: function () {
+      if (this.data.portmap) {
+        return this.data.portmap.split(',')
+      }
+      return {}
     }
   },
   methods: {
+    upTime () {
+      return this.data.down ? formatUptimeFromStart(this.data.down_from, true) : formatUptime(this.data.uptime, true, (this.data.uptime > 864000))
+    },
+    currentMacsCount: function (index) {
+      return this.data.current_macs_count[index] === '0' ? '' : this.data.current_macs_count[index]
+    },
+    statusDev () {
+      if (this.data.state === 'down') {
+        return 'status-down'
+      } else if (this.data.state === 'up') {
+        return 'status-ok'
+      }
+
+      return 'status-off'
+    },
+    portStatus (index) {
+      if (this.data.ports_on[index] === '1') {
+        if (this.data.untagged_ports[index] === '1') {
+          return 'port-access'
+        } else {
+          return 'port-trunk'
+        }
+      }
+      return 'port-off'
+    },
     getThisWindowAndHeaderElements () {
       return {
         window: window.document.getElementById(this.windowId),
@@ -240,7 +255,16 @@ export default {
   //     }
   //   }
   // },
-  mounted () {
+  created: async function () {
+    try {
+      const resp = await axios.get(`https://device-darsan.mol.net.ua/switch/${this.switch}`)
+      this.data = resp.data
+      // console.log(resp.data)
+    } catch (err) {
+      console.error('error in Window mounted')
+    }
+  },
+  mounted: function () {
     this.dragElement()
     const _window = this.getThisWindowAndHeaderElements().window
     _window.addEventListener('click', () => {
@@ -280,5 +304,9 @@ td.close::before {
     cursor: pointer;
     width: 10px;
     content: '\00d7';
+}
+
+td.title {
+  white-space: pre;
 }
 </style>

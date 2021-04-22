@@ -32,14 +32,14 @@
           </tr>
           </thead>
           <tbody>
-            <CentralRow v-for="item in devicesBar" :data="item" :key="item" @selected="createWindow" />
+            <CentralRow v-for="item in devicesBar" :data="item" :key="item" @selected="createWindow(item, $event)" />
           </tbody>
         </table>
       </div>
     </div>
   </div>
   <template v-for="block in windows.content" :key="block">
-    <component :is="block.component" @clickClose="closeWindow(block)" :block="block" :pageX="block.pageX" :pageY="block.pageY" :title="block.title"></component>
+    <component :is="block.component" @clickClose="closeWindow(block)" :block="block" :pageX="block.pageX" :pageY="block.pageY" :switch="block.switch"></component>
   </template>
 </template>
 
@@ -64,13 +64,12 @@ export default {
     node: Number
   },
   methods: {
-    createWindow: function (event) {
-      console.log(event)
+    createWindow: function (item, event) {
       this.windows.content.push({
         component: 'Window',
-        title: 'Client',
         pageX: event.clientX + 'px',
-        pageY: event.clientY + 'px'
+        pageY: event.clientY + 'px',
+        switch: item.entity
       })
     },
     closeWindow: function (item) {
