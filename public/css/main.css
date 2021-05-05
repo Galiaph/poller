@@ -565,7 +565,7 @@ td.device-port-cell div.device-port-olditems-count {
     text-align: center;
     background-color: #E3EBF2;
     font-size: 11px;
-    display: none;
+    /* display: none; */
 }
 td.device-port-cell div.device-port-num-stub {
     min-width: 24px;

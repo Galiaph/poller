@@ -65,10 +65,39 @@ export default {
   },
   methods: {
     createWindow: function (item, event) {
+      if (this.windows.content.find((el) => el.switch === item.entity)) {
+        return
+      }
+
+      const winW = window.innerWidth
+      const winH = screen.height
+      let x = event.clientX
+      let y = event.clientY
+      const width = 850
+      // eslint-disable-next-line no-unused-vars
+      let height = 245
+
+      if (x > winW / 2) {
+        x -= width
+      }
+
+      if (y - window.screenTop > winH / 2) {
+        y -= height
+      }
+
+      if (x + width > winW) {
+        x = winW - width - 10
+      }
+
+      if (y < 10) {
+        height -= y + 10
+        y = 10
+      }
+
       this.windows.content.push({
         component: 'Window',
-        pageX: event.clientX + 'px',
-        pageY: event.clientY + 'px',
+        pageX: x + 'px',
+        pageY: y + 'px',
         switch: item.entity
       })
     },
