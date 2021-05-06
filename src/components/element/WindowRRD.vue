@@ -15,14 +15,28 @@
         </table>
         <!-- <img src="/images/site/popup_close.png" @click.stop="$emit('clickClose')"> -->
       </div>
-      <div class="window-body" style="height: 205px;">
-        <img :src="src"/>
+      <div class="window-body" style="height: 215px;">
+        <div id="drop-down-header">
+          <div style="margin-bottom: 5px;">
+            <a class="title-link" title="Кликните для изменения" @click="isEditTag = !isEditTag" v-if="!isEditTag">{{ tag }}</a>
+            <input type="text" name="tag-text" v-model="tag" v-if="isEditTag" @keypress.enter="tagEdit()" autofocus/>
+          </div>
+          <select id="graph-duration" v-model="period">
+            <option value="day">1 день</option>
+            <option value="2day" selected>2 дня</option>
+            <option value="week">Неделя</option>
+            <option value="month">Месяц</option>
+            <option value="month3">3 Месяца</option>
+          </select>
+        </div>
+        <img :src="traffic"/>
+        <img :src="error"/>
       </div>
     </div>
 </template>
 
 <script>
-// import axios from 'axios'
+import axios from 'axios'
 
 export default {
   name: 'WindowRRD',
@@ -42,7 +56,7 @@ export default {
     },
     height: {
       type: String,
-      default: '280px'
+      default: '255px'
     },
     switch: {
       type: Number,
@@ -62,16 +76,32 @@ export default {
         return one + two + three
       })(),
       top: this.pageY,
-      left: this.pageX
+      left: this.pageX,
+      tag: '',
+      isEditTag: false,
+      period: '2day',
+      temp: '2day'
     }
   },
   computed: {
-    src: function () {
+    traffic: function () {
       const token = encodeURIComponent(this.$store.getters.getToken)
-      return `https://device-darsan.mol.net.ua/switch/${this.switch}/port/${this.port}/graph/traffic?period=2day&darsan2=${token}`
+      return `https://device-darsan.mol.net.ua/switch/${this.switch}/port/${this.port}/graph/traffic?period=${this.period}&darsan2=${token}`
+    },
+    error: function () {
+      const token = encodeURIComponent(this.$store.getters.getToken)
+      return `https://device-darsan.mol.net.ua/switch/${this.switch}/port/${this.port}/graph/error?period=${this.period}&darsan2=${token}`
     }
   },
   methods: {
+    async tagEdit () {
+      this.isEditTag = false
+      try {
+        await axios.put(`https://device-darsan.mol.net.ua/switch/${this.switch}/port/${this.port}/tag`, { port: this.port, tag: this.tag })
+      } catch (err) {
+        console.error('error in WindowRRD mounted')
+      }
+    },
     getThisWindowAndHeaderElements () {
       return {
         window: window.document.getElementById(this.windowId),
@@ -90,8 +120,8 @@ export default {
       function dragMouseDown (e) {
         e = e || window.event
         // get the mouse cursor position at startup:
-        pos3 = e.clientX
-        pos4 = e.clientY
+        pos3 = e.pageX
+        pos4 = e.pageY
         document.onmouseup = closeDragElement
         // call a function whenever the cursor moves:
         document.onmousemove = elementDrag
@@ -101,19 +131,17 @@ export default {
       function elementDrag (e) {
         e = e || window.event
         // calculate the new cursor position:
-        pos1 = pos3 - e.clientX
-        pos2 = pos4 - e.clientY
-        pos3 = e.clientX
-        pos4 = e.clientY
+        pos1 = pos3 - e.pageX
+        pos2 = pos4 - e.pageY
+        pos3 = e.pageX
+        pos4 = e.pageY
         // set the element's new position:
-        if (_window.offsetTop < (window.innerHeight - 35)) {
-          _window.style.top = (_window.offsetTop - pos2) + 'px'
-          context.top = _window.style.top
-        } else context.centerWindow()
-        if (_window.offsetLeft < (window.innerWidth - 35)) {
-          _window.style.left = (_window.offsetLeft - pos1) + 'px'
-          context.left = _window.style.left
-        } else context.centerWindow()
+        // set the element's new position:
+        _window.style.top = (_window.offsetTop - pos2) + 'px'
+        context.top = _window.style.top
+
+        _window.style.left = (_window.offsetLeft - pos1) + 'px'
+        context.left = _window.style.left
       }
 
       function closeDragElement () {
@@ -131,39 +159,39 @@ export default {
     },
     sendWindowToHighest () {
       this.getThisWindowAndHeaderElements().window.style.zIndex = this.getHighestWindow() + 1
-    },
-    centerWindow () {
-      const myElement = this.getThisWindowAndHeaderElements().window
-      const pageWidth = window.innerWidth
-      const pageHeight = window.innerHeight
-      const myElementWidth = myElement.offsetWidth
-      const myElementHeight = myElement.offsetHeight
-      const diff = this.activeWindows() * 20
-      myElement.style.top = (pageHeight / 2) - (myElementHeight / 2) + diff + 'px'
-      myElement.style.left = (pageWidth / 2) - (myElementWidth / 2) + diff + 'px'
-    },
-    checkTheresIsAnyAnotherCenteredWindow () {
-      // not being used anymore but working well...
-      const windows = Array.from(window.document.getElementsByClassName('vue-window-modal'))
-      const centeredWindows = windows.filter(el => {
-        const myElement = el
-        const pageWidth = window.innerWidth
-        const pageHeight = window.innerHeight
-        const myElementWidth = myElement.offsetWidth
-        const myElementHeight = myElement.offsetHeight
-        return el.style.top === (pageHeight / 2) - (myElementHeight / 2) + 'px' &&
-                      el.style.left === (pageWidth / 2) - (myElementWidth / 2) + 'px'
-      })
-
-      return centeredWindows
-    },
-    activeWindows () {
-      const windows = Array.from(window.document.getElementsByClassName('vue-window-modal'))
-      const openedWindows = windows.filter(el => {
-        return el.style.display === 'block'
-      })
-      return openedWindows.length
     }
+    // centerWindow () {
+    //   const myElement = this.getThisWindowAndHeaderElements().window
+    //   const pageWidth = window.innerWidth
+    //   const pageHeight = window.innerHeight
+    //   const myElementWidth = myElement.offsetWidth
+    //   const myElementHeight = myElement.offsetHeight
+    //   const diff = this.activeWindows() * 20
+    //   myElement.style.top = (pageHeight / 2) - (myElementHeight / 2) + diff + 'px'
+    //   myElement.style.left = (pageWidth / 2) - (myElementWidth / 2) + diff + 'px'
+    // },
+    // checkTheresIsAnyAnotherCenteredWindow () {
+    //   // not being used anymore but working well...
+    //   const windows = Array.from(window.document.getElementsByClassName('vue-window-modal'))
+    //   const centeredWindows = windows.filter(el => {
+    //     const myElement = el
+    //     const pageWidth = window.innerWidth
+    //     const pageHeight = window.innerHeight
+    //     const myElementWidth = myElement.offsetWidth
+    //     const myElementHeight = myElement.offsetHeight
+    //     return el.style.top === (pageHeight / 2) - (myElementHeight / 2) + 'px' &&
+    //                   el.style.left === (pageWidth / 2) - (myElementWidth / 2) + 'px'
+    //   })
+
+    //   return centeredWindows
+    // },
+    // activeWindows () {
+    //   const windows = Array.from(window.document.getElementsByClassName('vue-window-modal'))
+    //   const openedWindows = windows.filter(el => {
+    //     return el.style.display === 'block'
+    //   })
+    //   return openedWindows.length
+    // }
     // hide () {
     //   this.getThisWindowAndHeaderElements().window.style.display = 'none'
     // },
@@ -183,18 +211,17 @@ export default {
   //   }
   // },
   created: async function () {
-    // try {
-    //   const resp = await axios.get(`https://device-darsan.mol.net.ua/switch/${this.switch}/port/${this.port}/graph/traffic?period=2day`)
-    //   this.data = resp.data
-    //   // console.log(resp.data)
-    // } catch (err) {
-    //   console.error('error in Window mounted')
-    // }
+    try {
+      const resp = await axios.get(`https://device-darsan.mol.net.ua/switch/${this.switch}/port/${this.port}/tag`)
+      this.tag = resp.data.tag
+    } catch (err) {
+      console.error('error in WindowRRD mounted')
+    }
   },
   mounted: function () {
     this.dragElement()
     const _window = this.getThisWindowAndHeaderElements().window
-    _window.addEventListener('mousedown', () => {
+    _window.addEventListener('click', () => {
       this.sendWindowToHighest()
     })
     _window.style.zIndex = 9999
@@ -203,37 +230,37 @@ export default {
 </script>
 
 <style lang="scss">
-.vue-window-modal {
-    position: fixed;
-    background-color:#ffffff;
-    box-shadow: 6px 6px 10px 0px #707070;
-    border: solid 2px gray;
-    // border-radius: 3px;
-    // display: none;
-    padding: 0.5em;
-    max-height: 90vh;
-    max-width: 90vw;
-}
+// .vue-window-modal {
+//     position: fixed;
+//     background-color:#ffffff;
+//     box-shadow: 6px 6px 10px 0px #707070;
+//     border: solid 2px gray;
+//     // border-radius: 3px;
+//     // display: none;
+//     padding: 0.5em;
+//     max-height: 90vh;
+//     max-width: 90vw;
+// }
 
-.vue-window-modal .vue-window-modal-header {
-    background-color: rgb(114, 152, 195);
-    padding: 0.3em;
-    // border-top-left-radius: 3px;
-    // border-top-right-radius: 3px;
-    color: white;
-    // eight: 40px;
-    font-weight: bold;
-    // cursor: -webkit-grab;
-    // user-select: none;
-}
+// .vue-window-modal .vue-window-modal-header {
+//     background-color: rgb(114, 152, 195);
+//     padding: 0.3em;
+//     // border-top-left-radius: 3px;
+//     // border-top-right-radius: 3px;
+//     color: white;
+//     // eight: 40px;
+//     font-weight: bold;
+//     // cursor: -webkit-grab;
+//     // user-select: none;
+// }
 
-td.close::before {
-    cursor: pointer;
-    width: 10px;
-    content: '\00d7';
-}
+// td.close::before {
+//     cursor: pointer;
+//     width: 10px;
+//     content: '\00d7';
+// }
 
-td.title {
-  white-space: pre;
-}
+// td.title {
+//   white-space: pre;
+// }
 </style>

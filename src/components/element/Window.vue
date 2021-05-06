@@ -37,7 +37,7 @@
                     <template v-if="index % 2">
                       <div class="device-port-entity">
                         <div class="device-port-num drop-down-win">
-                          <a class="graph-link" :class="portStatus(index - 1)" href="" @click.prevent="select(index, $event)" :title="index">{{ index }}</a>
+                          <a class="graph-link" :class="portStatus(index - 1)" href="" @click.prevent.stop="select(index, $event)" :title="index">{{ index }}</a>
                           <!-- <a href="[%c.config.billing_client%][%uid%]" title="a[%uid%]" class="ok" target="_blank">&#x25CF;</a>
                           <a class="triangle" href="/device/details/[%link.id%]" title="[%link.ip _ link.comment%]">&#x25B3;</a> -->
                         </div>
@@ -57,7 +57,7 @@
                           <a class="macs-count" href="#">{{ currentMacsCount(index + 1) }}</a>
                         </div>
                         <div class="device-port-num drop-down-win">
-                          <a class="graph-link" :class="portStatus(index)" href="" @click.prevent="select(index + 1, $event)" :title="index">{{ index + 1 }}</a>
+                          <a class="graph-link" :class="portStatus(index)" href="" @click.prevent.stop="select(index + 1, $event)" :title="index">{{ index + 1 }}</a>
                         </div>
                       </div>
                     </template>
@@ -67,22 +67,15 @@
           </table>
         </div>
         <!-- <slot name="default"></slot> -->
-        <template v-for="block in windows.content" :key="block">
-          <component :is="block.component" @clickClose="closeWindow(block)" :block="block" :pageX="block.pageX" :pageY="block.pageY" :switch="block.switch" :port="block.port"></component>
-        </template>
     </div>
 </template>
 
 <script>
 import axios from 'axios'
-import WindowRRD from './WindowRRD.vue'
 import { formatUptime, formatUptimeFromStart } from './timeFunc.js'
 
 export default {
   name: 'Window',
-  components: {
-    WindowRRD
-  },
   props: {
     // active: Boolean,
     pageX: {
@@ -117,10 +110,10 @@ export default {
       top: this.pageY,
       left: this.pageX,
       data: {},
-      isShowOldMacs: false,
-      windows: {
-        content: []
-      }
+      isShowOldMacs: false
+      // windows: {
+      //   content: []
+      // }
     }
   },
   computed: {
@@ -133,52 +126,8 @@ export default {
   },
   methods: {
     select: function (port, event) {
-      console.log('Click graph link')
-      this.createWindow(this.switch, port, event)
-    },
-    createWindow: function (sw, port, event) {
-      if (this.windows.content.find((el) => el.switch === sw && el.port === port)) {
-        return
-      }
-
-      const winW = window.innerWidth
-      const winH = screen.height
-      let x = event.clientX
-      let y = event.clientY
-      const width = 630
-      // eslint-disable-next-line no-unused-vars
-      let height = 280
-
-      if (x > winW / 2) {
-        x -= width
-      }
-
-      if (y - window.screenTop > winH / 2) {
-        y -= height
-      }
-
-      if (x + width > winW) {
-        x = winW - width - 10
-      }
-
-      if (y < 10) {
-        height -= y + 10
-        y = 10
-      }
-
-      this.windows.content.push({
-        component: 'WindowRRD',
-        pageX: x + 'px',
-        pageY: y + 'px',
-        switch: sw,
-        port: port
-      })
-    },
-    closeWindow: function (item) {
-      const index = this.windows.content.indexOf(item)
-      if (index > -1) {
-        this.windows.content.splice(index, 1)
-      }
+      const swt = this.switch
+      this.$emit('selectport', { event, swt, port })
     },
     upTime () {
       return this.data.down ? formatUptimeFromStart(this.data.down_from, true) : formatUptime(this.data.uptime, true, (this.data.uptime > 864000))
@@ -223,12 +172,11 @@ export default {
       const _window = this.getThisWindowAndHeaderElements().window
       const _windowHeader = this.getThisWindowAndHeaderElements().windowHeader
       _windowHeader.onmousedown = dragMouseDown
-      // _windowHeader.onscroll = onScroll
       function dragMouseDown (e) {
         e = e || window.event
         // get the mouse cursor position at startup:
-        pos3 = e.clientX
-        pos4 = e.clientY
+        pos3 = e.pageX
+        pos4 = e.pageY
         document.onmouseup = closeDragElement
         // call a function whenever the cursor moves:
         document.onmousemove = elementDrag
@@ -238,19 +186,17 @@ export default {
       function elementDrag (e) {
         e = e || window.event
         // calculate the new cursor position:
-        pos1 = pos3 - e.clientX
-        pos2 = pos4 - e.clientY
-        pos3 = e.clientX
-        pos4 = e.clientY
+        pos1 = pos3 - e.pageX
+        pos2 = pos4 - e.pageY
+        pos3 = e.pageX
+        pos4 = e.pageY
+
         // set the element's new position:
-        if (_window.offsetTop < (window.innerHeight - 35)) {
-          _window.style.top = (_window.offsetTop - pos2) + 'px'
-          context.top = _window.style.top
-        } else context.centerWindow()
-        if (_window.offsetLeft < (window.innerWidth - 35)) {
-          _window.style.left = (_window.offsetLeft - pos1) + 'px'
-          context.left = _window.style.left
-        } else context.centerWindow()
+        _window.style.top = (_window.offsetTop - pos2) + 'px'
+        context.top = _window.style.top
+
+        _window.style.left = (_window.offsetLeft - pos1) + 'px'
+        context.left = _window.style.left
       }
 
       function closeDragElement () {
@@ -259,24 +205,6 @@ export default {
         document.onmousemove = null
         // _windowHeader.style.cursor = '-webkit-grab'
       }
-
-      // function onScroll (e) {
-      //   e = e || window.event
-
-      //   pos1 = pos3 - e.clientX
-      //   pos2 = pos4 - e.clientY
-      //   pos3 = e.clientX
-      //   pos4 = e.clientY
-      //   // set the element's new position:
-      //   if (_window.offsetTop < (window.innerHeight - 35)) {
-      //     _window.style.top = (_window.offsetTop - pos2) + 'px'
-      //     context.top = _window.style.top
-      //   } else context.centerWindow()
-      //   if (_window.offsetLeft < (window.innerWidth - 35)) {
-      //     _window.style.left = (_window.offsetLeft - pos1) + 'px'
-      //     context.left = _window.style.left
-      //   } else context.centerWindow()
-      // }
     },
     getHighestWindow () {
       const windows = Array.from(window.document.getElementsByClassName('vue-window-modal'))
@@ -286,39 +214,39 @@ export default {
     },
     sendWindowToHighest () {
       this.getThisWindowAndHeaderElements().window.style.zIndex = this.getHighestWindow() + 1
-    },
-    centerWindow () {
-      const myElement = this.getThisWindowAndHeaderElements().window
-      const pageWidth = window.innerWidth
-      const pageHeight = window.innerHeight
-      const myElementWidth = myElement.offsetWidth
-      const myElementHeight = myElement.offsetHeight
-      const diff = this.activeWindows() * 20
-      myElement.style.top = (pageHeight / 2) - (myElementHeight / 2) + diff + 'px'
-      myElement.style.left = (pageWidth / 2) - (myElementWidth / 2) + diff + 'px'
-    },
-    checkTheresIsAnyAnotherCenteredWindow () {
-      // not being used anymore but working well...
-      const windows = Array.from(window.document.getElementsByClassName('vue-window-modal'))
-      const centeredWindows = windows.filter(el => {
-        const myElement = el
-        const pageWidth = window.innerWidth
-        const pageHeight = window.innerHeight
-        const myElementWidth = myElement.offsetWidth
-        const myElementHeight = myElement.offsetHeight
-        return el.style.top === (pageHeight / 2) - (myElementHeight / 2) + 'px' &&
-                      el.style.left === (pageWidth / 2) - (myElementWidth / 2) + 'px'
-      })
-
-      return centeredWindows
-    },
-    activeWindows () {
-      const windows = Array.from(window.document.getElementsByClassName('vue-window-modal'))
-      const openedWindows = windows.filter(el => {
-        return el.style.display === 'block'
-      })
-      return openedWindows.length
     }
+    // centerWindow () {
+    //   const myElement = this.getThisWindowAndHeaderElements().window
+    //   const pageWidth = window.innerWidth
+    //   const pageHeight = window.innerHeight
+    //   const myElementWidth = myElement.offsetWidth
+    //   const myElementHeight = myElement.offsetHeight
+    //   const diff = this.activeWindows() * 20
+    //   myElement.style.top = (pageHeight / 2) - (myElementHeight / 2) + diff + 'px'
+    //   myElement.style.left = (pageWidth / 2) - (myElementWidth / 2) + diff + 'px'
+    // },
+    // checkTheresIsAnyAnotherCenteredWindow () {
+    //   // not being used anymore but working well...
+    //   const windows = Array.from(window.document.getElementsByClassName('vue-window-modal'))
+    //   const centeredWindows = windows.filter(el => {
+    //     const myElement = el
+    //     const pageWidth = window.innerWidth
+    //     const pageHeight = window.innerHeight
+    //     const myElementWidth = myElement.offsetWidth
+    //     const myElementHeight = myElement.offsetHeight
+    //     return el.style.top === (pageHeight / 2) - (myElementHeight / 2) + 'px' &&
+    //                   el.style.left === (pageWidth / 2) - (myElementWidth / 2) + 'px'
+    //   })
+
+    //   return centeredWindows
+    // },
+    // activeWindows () {
+    //   const windows = Array.from(window.document.getElementsByClassName('vue-window-modal'))
+    //   const openedWindows = windows.filter(el => {
+    //     return el.style.display === 'block'
+    //   })
+    //   return openedWindows.length
+    // }
     // hide () {
     //   this.getThisWindowAndHeaderElements().window.style.display = 'none'
     // },
@@ -349,17 +277,17 @@ export default {
   mounted: function () {
     this.dragElement()
     const _window = this.getThisWindowAndHeaderElements().window
-    _window.addEventListener('mousedown', () => {
+    _window.addEventListener('click', () => {
       this.sendWindowToHighest()
     })
-    _window.style.zIndex = 9999
+    _window.style.zIndex = 999
   }
 }
 </script>
 
 <style lang="scss">
 .vue-window-modal {
-    position: fixed;
+    position: absolute;
     background-color:#ffffff;
     box-shadow: 6px 6px 10px 0px #707070;
     border: solid 2px gray;

@@ -335,7 +335,7 @@ td.item-box-left-stub {
 }
 td.item-box-right-stub {
     height: 26px;
-    width: 3px;
+    width: 5px;
     background: transparent url(/images/site/i_entry_right.png) no-repeat scroll left top;
 }
 td.item-box-image img {

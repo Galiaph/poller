@@ -39,7 +39,7 @@
     </div>
   </div>
   <template v-for="block in windows.content" :key="block">
-    <component :is="block.component" @clickClose="closeWindow(block)" :block="block" :pageX="block.pageX" :pageY="block.pageY" :switch="block.switch"></component>
+    <component :is="block.component" @clickClose="closeWindow(block)" :block="block" :pageX="block.pageX" :pageY="block.pageY" :switch="block.switch" :port="block.port" @selectport="createWindowRRD(block, $event)"></component>
   </template>
 </template>
 
@@ -47,12 +47,14 @@
 // import axios from 'axios'
 import CentralRow from './element/CentralRow.vue'
 import Window from './element/Window.vue'
+import WindowRRD from './element/WindowRRD.vue'
 
 export default {
   name: 'CentralBar',
   components: {
     CentralRow,
-    Window
+    Window,
+    WindowRRD
   },
   data: () => ({
     windows: {
@@ -71,8 +73,8 @@ export default {
 
       const winW = window.innerWidth
       const winH = screen.height
-      let x = event.clientX
-      let y = event.clientY
+      let x = event.pageX
+      let y = event.pageY
       const width = 850
       // eslint-disable-next-line no-unused-vars
       let height = 245
@@ -99,6 +101,44 @@ export default {
         pageX: x + 'px',
         pageY: y + 'px',
         switch: item.entity
+      })
+    },
+    createWindowRRD: function (item, { event, swt, port }) {
+      if (this.windows.content.find((el) => el.switch === swt && el.port === port)) {
+        return
+      }
+
+      const winW = window.innerWidth
+      const winH = screen.height
+      let x = event.pageX
+      let y = event.pageY
+      const width = 630
+      // eslint-disable-next-line no-unused-vars
+      let height = 280
+
+      if (x > winW / 2) {
+        x -= width
+      }
+
+      if (y - window.screenTop > winH / 2) {
+        y -= height
+      }
+
+      if (x + width > winW) {
+        x = winW - width - 10
+      }
+
+      if (y < 10) {
+        height -= y + 10
+        y = 10
+      }
+
+      this.windows.content.push({
+        component: 'WindowRRD',
+        pageX: x + 'px',
+        pageY: y + 'px',
+        switch: swt,
+        port: port
       })
     },
     closeWindow: function (item) {
