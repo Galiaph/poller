@@ -7,7 +7,10 @@
         <table style="margin: 0px;">
           <tbody>
             <tr>
-              <td class="title">{{ `Port ${port}` }}</td>
+              <td class="title">
+                {{ `Port ${port} Абоненты ` }}
+                (<span title="Известных маков" class="port-mac-authed">{{ usersCount }}</span> + <span title="Не известных маков" class="port-mac-non-authed">{{ fdbCount }}</span>)
+              </td>
               <td :id="windowId + '-' + 'header'" class="window-header-spacer" style="width: 600px;"></td>
               <td class="close" @click.stop="$emit('clickClose')"></td>
             </tr>
@@ -16,30 +19,53 @@
         <!-- <img src="/images/site/popup_close.png" @click.stop="$emit('clickClose')"> -->
       </div>
       <div class="window-body" style="height: 215px;">
-        <div id="drop-down-header">
-          <div style="margin-bottom: 5px;">
-            <a class="title-link" title="Кликните для изменения" @click="isEditTag = !isEditTag" v-if="!isEditTag">{{ tag }}</a>
-            <input type="text" name="tag-text" v-model="tag" v-if="isEditTag" @keydown.esc="tagEsc" @keypress.enter="tagEdit" autofocus/>
-          </div>
-          <select id="graph-duration" v-model="period">
-            <option value="day">1 день</option>
-            <option value="2day" selected>2 дня</option>
-            <option value="week">Неделя</option>
-            <option value="month">Месяц</option>
-            <option value="month3">3 Месяца</option>
-          </select>
+        <div id="mac-list">
+            <table id="mac-list-table" class="sorted-table">
+                <thead>
+                    <tr>
+                      <th>Ст</th>
+                      <th class="sorted-asc alpha">Логин</th>
+                      <th>MAC</th>
+                      <th>vlan</th>
+                      <th class="non-sorted numericus">Время</th>
+                      <th onclick="$('.pingAllWs').trigger('click')" style="cursor: pointer;">Ping</th>
+                    </tr>
+                </thead>
+                <tbody id="table-stuff">
+                    <tr class="odd stuff" v-for="item in users" :data="item" :key="item">
+                        <td class="image">
+                            <img :src="'/images/site/st_' + userState(item) + '.png'" :title="item.connection_type">
+                        </td>
+                        <td class="login">
+                          <!-- <a :href="'https://radix.mol.net.ua/client/' + item.uid">{{  item.login }}</a> -->
+                          {{  item.login }}
+                        </td>
+                        <td class="mac">
+                            {{ item.mac }}
+                        </td>
+                        <td>
+                            {{ userVlan(item.mac) }}
+                        </td>
+                        <td class="since">
+                          {{ time(item.duration) }}
+                        </td>
+                        <td class="ping-cell">
+                            <span>-</span>
+                        </td>
+                    </tr>
+                </tbody>
+            </table>
         </div>
-        <img :src="traffic"/>
-        <img :src="error"/>
       </div>
     </div>
 </template>
 
 <script>
 import axios from 'axios'
+import { formatUptime } from './timeFunc.js'
 
 export default {
-  name: 'WindowRRD',
+  name: 'WindowMAC',
   props: {
     // active: Boolean,
     pageX: {
@@ -77,37 +103,29 @@ export default {
       })(),
       top: this.pageY,
       left: this.pageX,
-      tag: '',
-      tagOld: '',
-      isEditTag: false,
-      period: '2day',
-      temp: '2day'
-    }
-  },
-  computed: {
-    traffic: function () {
-      const token = encodeURIComponent(this.$store.getters.getToken)
-      return `https://device-darsan.mol.net.ua/switch/${this.switch}/port/${this.port}/graph/traffic?period=${this.period}&darsan2=${token}`
-    },
-    error: function () {
-      const token = encodeURIComponent(this.$store.getters.getToken)
-      return `https://device-darsan.mol.net.ua/switch/${this.switch}/port/${this.port}/graph/error?period=${this.period}&darsan2=${token}`
+      fdb: [],
+      users: [],
+      fdbCount: 0,
+      usersCount: 0
     }
   },
   methods: {
-    tagEsc (event) {
-      if (this.isEditTag) {
-        this.isEditTag = false
-        this.tag = this.tagOld
+    time: function (duration) {
+      if (duration === 0) {
+        return '-'
       }
+
+      return formatUptime(duration, true)
     },
-    async tagEdit () {
-      this.isEditTag = false
-      try {
-        await axios.put(`https://device-darsan.mol.net.ua/switch/${this.switch}/port/${this.port}/tag`, { port: this.port, tag: this.tag })
-      } catch (err) {
-        console.error('error in WindowRRD mounted')
+    userState: function (user) {
+      if (user.duration > 0 && user.ip) {
+        return 'on'
       }
+
+      return 'off'
+    },
+    userVlan: function (mac) {
+      return this.fdb.find(el => el.mac === mac).vlan
     },
     getThisWindowAndHeaderElements () {
       return {
@@ -219,9 +237,41 @@ export default {
   // },
   created: async function () {
     try {
-      const resp = await axios.get(`https://device-darsan.mol.net.ua/switch/${this.switch}/port/${this.port}/tag`)
-      this.tag = resp.data.tag
-      this.tagOld = resp.data.tag
+      const resp = await axios.get(`https://device-darsan.mol.net.ua/switch/${this.switch}/port/${this.port}/fdb`)
+      this.fdb = resp.data
+      const macs = []
+      this.fdb.forEach(element => {
+        macs.push(element.mac.replaceAll(':', ''))
+      })
+      const resp2 = await axios.post('https://client-darsan.mol.net.ua/clients-from-macs', 'macs=' + macs.join(','))
+      this.users = resp2.data
+      this.usersCount = this.users.length
+      this.fdbCount = this.fdb.length - this.usersCount
+
+      this.fdb.forEach(el => {
+        const res = this.users.filter(el2 => el.mac === el2.mac)
+
+        if (res.length === 0) {
+          this.users.push({
+            connection_type: '',
+            duration: 0,
+            ip: '',
+            login: '',
+            mac: el.mac,
+            uid: 0
+          })
+        }
+      })
+
+      this.users.sort((a, b) => {
+        if (a.login > b.login) {
+          return 1
+        } else if (a.login < b.login) {
+          return -1
+        }
+
+        return 0
+      })
     } catch (err) {
       console.error('error in WindowRRD mounted')
     }
@@ -238,37 +288,4 @@ export default {
 </script>
 
 <style lang="scss">
-// .vue-window-modal {
-//     position: fixed;
-//     background-color:#ffffff;
-//     box-shadow: 6px 6px 10px 0px #707070;
-//     border: solid 2px gray;
-//     // border-radius: 3px;
-//     // display: none;
-//     padding: 0.5em;
-//     max-height: 90vh;
-//     max-width: 90vw;
-// }
-
-// .vue-window-modal .vue-window-modal-header {
-//     background-color: rgb(114, 152, 195);
-//     padding: 0.3em;
-//     // border-top-left-radius: 3px;
-//     // border-top-right-radius: 3px;
-//     color: white;
-//     // eight: 40px;
-//     font-weight: bold;
-//     // cursor: -webkit-grab;
-//     // user-select: none;
-// }
-
-// td.close::before {
-//     cursor: pointer;
-//     width: 10px;
-//     content: '\00d7';
-// }
-
-// td.title {
-//   white-space: pre;
-// }
 </style>
