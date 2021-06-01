@@ -3,6 +3,7 @@ default.json
 sample
 node_modules
 /dist
+build.sh
 
 # local env files
 .env.local

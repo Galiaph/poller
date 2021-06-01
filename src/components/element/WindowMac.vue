@@ -37,8 +37,7 @@
                             <img :src="'/images/site/st_' + userState(item) + '.png'" :title="item.connection_type">
                         </td>
                         <td class="login">
-                          <!-- <a :href="'https://radix.mol.net.ua/client/' + item.uid">{{  item.login }}</a> -->
-                          {{  item.login }}
+                          <a class="show-hidden" :href="'https://radix.mol.net.ua/client/' + item.uid" v-if="item.uid" target="_blank">{{  item.login }}</a>
                         </td>
                         <td class="mac">
                             {{ item.mac }}
