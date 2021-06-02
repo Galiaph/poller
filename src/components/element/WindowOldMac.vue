@@ -8,7 +8,7 @@
           <tbody>
             <tr>
               <td class="title">
-                {{ `Port ${port} Абоненты ` }}
+                {{ `Port ${port} Прошлые абоненты ` }}
                 (<span title="Известных маков" class="port-mac-authed">{{ usersCount }}</span> + <span title="Не известных маков" class="port-mac-non-authed">{{ fdbCount }}</span>)
               </td>
               <td :id="windowId + '-' + 'header'" class="window-header-spacer" style="width: 600px;"></td>
@@ -27,8 +27,8 @@
                       <th class="sorted-asc alpha">Логин</th>
                       <th>MAC</th>
                       <th>vlan</th>
-                      <th>Время</th>
-                      <th onclick="$('.pingAllWs').trigger('click')" style="cursor: pointer;">Ping</th>
+                      <th>С</th>
+                      <th>До</th>
                     </tr>
                 </thead>
                 <tbody id="table-stuff">
@@ -45,11 +45,11 @@
                         <td>
                           {{ userVlan(item.mac) }}
                         </td>
-                        <td class="since">
-                          {{ time(item.duration) }}
+                        <td>
+                          {{ item.start }}
                         </td>
-                        <td class="ping-cell">
-                          <span>-</span>
+                        <td>
+                          {{ item.end }}
                         </td>
                     </tr>
                 </tbody>
@@ -64,7 +64,7 @@ import axios from 'axios'
 import { formatUptime } from './timeFunc.js'
 
 export default {
-  name: 'WindowMAC',
+  name: 'WindowOldMac',
   props: {
     // active: Boolean,
     pageX: {
@@ -236,7 +236,7 @@ export default {
   // },
   created: async function () {
     try {
-      const resp = await axios.get(`https://device-darsan.mol.net.ua/switch/${this.switch}/port/${this.port}/fdb`)
+      const resp = await axios.get(`https://device-darsan.mol.net.ua/switch/${this.switch}/port/${this.port}/oldmacs`)
       this.fdb = resp.data
       const macs = []
       this.fdb.forEach(element => {
@@ -253,13 +253,19 @@ export default {
           this.fdbCount += 1
           this.users.push({
             connection_type: '',
-            duration: 0,
+            duration: null,
             ip: '',
-            login: null,
+            login: '',
             mac: el.mac,
-            uid: 0
+            uid: null
           })
         }
+      })
+
+      this.users.forEach(el => {
+        const res = this.fdb.filter(el2 => el.mac === el2.mac)
+        el.start = res[0].start
+        el.end = res[0].end
       })
 
       this.users.sort((a, b) => {
@@ -272,7 +278,7 @@ export default {
         return 0
       })
     } catch (err) {
-      console.error('error in WindowMac mounted')
+      console.error('error in WindowOldMac mounted')
     }
   },
   mounted: function () {

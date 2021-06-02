@@ -39,7 +39,7 @@
     </div>
   </div>
   <template v-for="block in windows.content" :key="block">
-    <component :is="block.component" @clickClose="closeWindow(block)" :block="block" :pageX="block.pageX" :pageY="block.pageY" :switch="block.switch" :port="block.port" @selectport="createWindowRRD(block, $event)" @selectmac="createWindowMac(block, $event)"></component>
+    <component :is="block.component" @clickClose="closeWindow(block)" :block="block" :pageX="block.pageX" :pageY="block.pageY" :switch="block.switch" :port="block.port" @selectport="createWindowRRD(block, $event)" @selectmac="createWindowMac(block, $event)" @selectoldmac="createWindowOldMac(block, $event)"></component>
   </template>
 </template>
 
@@ -49,6 +49,7 @@ import CentralRow from './element/CentralRow.vue'
 import Window from './element/Window.vue'
 import WindowRRD from './element/WindowRRD.vue'
 import WindowMac from './element/WindowMac.vue'
+import WindowOldMac from './element/WindowOldMac.vue'
 
 export default {
   name: 'CentralBar',
@@ -56,7 +57,8 @@ export default {
     CentralRow,
     Window,
     WindowRRD,
-    WindowMac
+    WindowMac,
+    WindowOldMac
   },
   data: () => ({
     windows: {
@@ -106,7 +108,7 @@ export default {
       })
     },
     createWindowRRD: function (item, { event, swt, port }) {
-      if (this.windows.content.find((el) => el.switch === swt && el.port === port)) {
+      if (this.windows.content.find((el) => el.switch === swt && el.port === port && el.component === 'WindowRRD')) {
         return
       }
 
@@ -144,7 +146,7 @@ export default {
       })
     },
     createWindowMac: function (item, { event, swt, port }) {
-      if (this.windows.content.find((el) => el.switch === swt && el.port === port)) {
+      if (this.windows.content.find((el) => el.switch === swt && el.port === port && el.component === 'WindowMac')) {
         return
       }
 
@@ -175,6 +177,44 @@ export default {
 
       this.windows.content.push({
         component: 'WindowMac',
+        pageX: x + 'px',
+        pageY: y + 'px',
+        switch: swt,
+        port: port
+      })
+    },
+    createWindowOldMac: function (item, { event, swt, port }) {
+      if (this.windows.content.find((el) => el.switch === swt && el.port === port && el.component === 'WindowOldMac')) {
+        return
+      }
+
+      const winW = window.innerWidth
+      const winH = screen.height
+      let x = event.pageX
+      let y = event.pageY
+      const width = 630
+      // eslint-disable-next-line no-unused-vars
+      let height = 280
+
+      if (x > winW / 2) {
+        x -= width
+      }
+
+      if (y - window.screenTop > winH / 2) {
+        y -= height
+      }
+
+      if (x + width > winW) {
+        x = winW - width - 10
+      }
+
+      if (y < 10) {
+        height -= y + 10
+        y = 10
+      }
+
+      this.windows.content.push({
+        component: 'WindowOldMac',
         pageX: x + 'px',
         pageY: y + 'px',
         switch: swt,

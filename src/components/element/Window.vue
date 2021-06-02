@@ -46,12 +46,12 @@
                           <!-- <a class="macs-count" href="[% '/device/currmacs/' _ fields.device_id _ '/' _ loop.count %]">[% item.number -%]</a> -->
                         </div>
                         <div class="device-port-olditems-count drop-down-win" v-if="isShowOldMacs">
-                          <a class="oldmacs-count" href="#">{{ oldMacsCount(index) }}</a>
+                          <a class="oldmacs-count" href="" @click.prevent.stop="selectOldMac(index, $event)">{{ oldMacsCount(index) }}</a>
                         </div>
                       </div>
                       <div class="device-port-entity">
                         <div class="device-port-olditems-count drop-down-win" v-if="isShowOldMacs">
-                          <a class="oldmacs-count" href="#">{{ oldMacsCount(index + 1) }}</a>
+                          <a class="oldmacs-count" href="" @click.prevent.stop="selectOldMac(index + 1, $event)">{{ oldMacsCount(index + 1) }}</a>
                         </div>
                         <div class="device-port-items-count drop-down-win">
                           <a class="macs-count" href="" @click.prevent.stop="selectMac(index + 1, $event)">{{ currentMacsCount(index + 1) }}</a>
@@ -132,6 +132,10 @@ export default {
     selectMac: function (port, event) {
       const swt = this.switch
       this.$emit('selectmac', { event, swt, port })
+    },
+    selectOldMac: function (port, event) {
+      const swt = this.switch
+      this.$emit('selectoldmac', { event, swt, port })
     },
     upTime () {
       return this.data.down ? formatUptimeFromStart(this.data.down_from, true) : formatUptime(this.data.uptime, true, (this.data.uptime > 864000))

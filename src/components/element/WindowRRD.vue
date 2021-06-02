@@ -29,8 +29,12 @@
             <option value="month3">3 Месяца</option>
           </select>
         </div>
-        <img :src="traffic"/>
-        <img :src="error"/>
+        <div>
+          <img :src="traffic" alt="График недоступен"/>
+        </div>
+        <div>
+          <img :src="error" alt="График недоступен"/>
+        </div>
       </div>
     </div>
 </template>

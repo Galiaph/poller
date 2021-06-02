@@ -772,6 +772,9 @@ table#mac-list-table th.sorted-desc {
     cursor: pointer;
     padding-left: 6px;
 }
+table#mac-list-table td.ping-cell {
+    text-align: center;
+}
 a.show-hidden:active,
 a.show-hidden:visited,
 a.show-hidden:link {

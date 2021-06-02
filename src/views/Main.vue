@@ -11,9 +11,10 @@
 // @ is an alias to /src
 import Header from '@/components/Header'
 import LeftBar from '@/components/LeftBar'
-import CentralBar from '@/components/CentralBar.vue'
+import CentralBar from '@/components/CentralBar'
 import RightBar from '@/components/RightBar'
 import axios from 'axios'
+import { Announcer } from '../components/element/announcer.js'
 
 export default {
   name: 'Main',
@@ -26,7 +27,8 @@ export default {
   data: () => ({
     selecteNode: 10,
     groupDevices: {},
-    Devices: {}
+    Devices: {},
+    wss: null
   }),
   methods: {
     rowSelected: function (event) {
@@ -49,6 +51,59 @@ export default {
         return 0
       })
     }
+  },
+  created: function () {
+    const announcerEvents = {
+      'poller.poll-completed': async (message) => {
+        console.log('poller.poll-completed')
+        try {
+          this.getGroup()
+          this.getDevices()
+        } catch (err) {
+          console.error('error in Main mounted')
+        }
+      },
+      'poller.loop': (message) => {
+        console.log('poller.loop')
+        console.log(message)
+      },
+      'poller.loop-syslog': (message) => {
+        console.log('poller.loop-syslog')
+        console.log(message)
+      },
+      'poller.in-errors': (message) => {
+        console.log('poller.in-errors')
+        console.log(message)
+      },
+      'poller.out-errors': (message) => {
+        console.log('poller.out-errors')
+        console.log(message)
+      },
+      'poller.notify': (message) => {
+        console.log('poller.notify')
+        console.log(message)
+      },
+      'announcer.alert': (message) => {
+        console.log('poller.alert')
+        console.log(message)
+      },
+      'announcer.test': (message) => {
+        console.log('poller.test')
+        console.log(message)
+      }
+    }
+
+    this.wss = new Announcer(['poller.*', 'announcer.*'], announcerEvents, {
+      onOpen: () => {
+        console.log('Уведомления включены')
+      },
+      onError: (err) => {
+        console.log('wssError' + err)
+      },
+      onClose: () => {
+        console.log('Соединение с сервером "+url+" потеряно. Уведомления будут недоступны')
+      }
+    })
   },
   mounted: async function () {
     try {
