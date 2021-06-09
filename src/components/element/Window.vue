@@ -38,12 +38,9 @@
                       <div class="device-port-entity">
                         <div class="device-port-num drop-down-win">
                           <a class="graph-link" :class="portStatus(index - 1)" href="" @click.prevent.stop="select(index, $event)" :title="index">{{ index }}</a>
-                          <!-- <a href="[%c.config.billing_client%][%uid%]" title="a[%uid%]" class="ok" target="_blank">&#x25CF;</a>
-                          <a class="triangle" href="/device/details/[%link.id%]" title="[%link.ip _ link.comment%]">&#x25B3;</a> -->
                         </div>
-                        <div class="device-port-items-count drop-down-win">
+                        <div class="device-port-items-count drop-down-win" @dblclick.prevent.stop="changePort(index)">
                           <a class="macs-count" href="" @click.prevent.stop="selectMac(index, $event)">{{ currentMacsCount(index) }}</a>
-                          <!-- <a class="macs-count" href="[% '/device/currmacs/' _ fields.device_id _ '/' _ loop.count %]">[% item.number -%]</a> -->
                         </div>
                         <div class="device-port-olditems-count drop-down-win" v-if="isShowOldMacs">
                           <a class="oldmacs-count" href="" @click.prevent.stop="selectOldMac(index, $event)">{{ oldMacsCount(index) }}</a>
@@ -53,11 +50,11 @@
                         <div class="device-port-olditems-count drop-down-win" v-if="isShowOldMacs">
                           <a class="oldmacs-count" href="" @click.prevent.stop="selectOldMac(index + 1, $event)">{{ oldMacsCount(index + 1) }}</a>
                         </div>
-                        <div class="device-port-items-count drop-down-win">
+                        <div class="device-port-items-count drop-down-win" @dblclick.prevent.stop="changePort(index + 1)">
                           <a class="macs-count" href="" @click.prevent.stop="selectMac(index + 1, $event)">{{ currentMacsCount(index + 1) }}</a>
                         </div>
                         <div class="device-port-num drop-down-win">
-                          <a class="graph-link" :class="portStatus(index)" href="" @click.prevent.stop="select(index + 1, $event)" :title="index">{{ index + 1 }}</a>
+                          <a class="graph-link" :class="portStatus(index)" href="" @dblclick.prevent.stop="changePort(index)" @click.prevent.stop="select(index + 1, $event)" :title="index">{{ index + 1 }}</a>
                         </div>
                       </div>
                     </template>
@@ -73,6 +70,7 @@
 <script>
 import axios from 'axios'
 import { formatUptime, formatUptimeFromStart } from './timeFunc.js'
+import { useToast } from 'vue-toastification'
 
 export default {
   name: 'Window',
@@ -125,6 +123,33 @@ export default {
     }
   },
   methods: {
+    changePort: async function (port) {
+      const toast = useToast()
+
+      if (this.data.state === 'down') {
+        toast.info('Нельзя выключить порт на не работающем свитче!', { timeout: 3000, bodyClassName: ['custom-class-1'] })
+        return
+      }
+      let stat = false
+
+      try {
+        const res = await axios.get(`https://device-darsan.mol.net.ua/device/${this.switch}/port/${port}/status`)
+        stat = !res.data.status
+        console.log('port: ' + port + ' status: ' + res.data.status)
+        if (this.portStatus(port - 1) === 'port-trunk') {
+          toast.info('Нельзя выключать транковый порт!', { timeout: 3000, bodyClassName: ['custom-class-1'] })
+        } else {
+          const resp = await axios.patch(`https://device-darsan.mol.net.ua/device/${this.switch}/port/${port}/status`, { status: stat })
+          console.log(resp.data)
+
+          if (resp.data.status === stat) {
+            toast.info(`Порт ${port} ${stat ? 'включен' : 'выключен'}`, { timeout: 3000, bodyClassName: ['custom-class-1'] })
+          }
+        }
+      } catch (err) {
+        toast.error(`Не получилось ${stat ? 'включить' : 'выключить'} порт`, { timeout: 3000, bodyClassName: ['custom-class-1'] })
+      }
+    },
     select: function (port, event) {
       const swt = this.switch
       this.$emit('selectport', { event, swt, port })

@@ -3,7 +3,6 @@
      <div id="header-menu">
        <div id="main-menu">
          <div id="main-menu-left">
-           <span id="ws-star" title="Уведомления недоступны">&#x2731;</span>
            <a class="main-menu-item" href="">
              Устройства
            </a>

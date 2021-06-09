@@ -224,8 +224,8 @@ export default {
   created: async function () {
     try {
       const resp = await axios.get(`https://device-darsan.mol.net.ua/switch/${this.switch}/port/${this.port}/tag`)
-      this.tag = resp.data.tag
-      this.tagOld = resp.data.tag
+      this.tag = resp.data.tag || 'empty'
+      this.tagOld = resp.data.tag || 'empty'
     } catch (err) {
       console.error('error in WindowRRD mounted')
     }

@@ -71,7 +71,7 @@ const errorInterceptor = async error => {
 
     case 403:
       console.error(error.response.status, error.message)
-      toast.error(error.response.data, { timeout: 3000 })
+      toast.error(error.response.data, { timeout: 3000, bodyClassName: ['custom-class-1'] })
       await store.dispatch('logout')
       router.push('/login')
       break

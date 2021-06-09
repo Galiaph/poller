@@ -5,7 +5,7 @@ import Main from '../views/Main.vue'
 const routes = [
   {
     path: '/',
-    name: 'Main',
+    alias: ['/node/:id'],
     component: Main,
     meta: {
       requiresAuth: true

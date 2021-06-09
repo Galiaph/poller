@@ -20,7 +20,7 @@
         <a class="modal" href="" title="Добавить группу ВЛАНов"><img src="/images/site/domain_add.png"/></a>
       </div>
     </div>
-    <LeftRow v-for="(item, index) in groupDevicesBar" :data="item" :key="item" :is-selected="itemSelected === index" @selected="select(index)" />
+    <LeftRow v-for="(item, index) in groupDevicesBar" :data="item" :key="item" :is-selected="item.entity === groupSelect" @selected="select(index)" />
     <div class="group-box-bottom"></div>
   </div>
 </template>
@@ -35,14 +35,18 @@ export default {
     LeftRow
   },
   props: {
-    groupDevicesBar: Object
+    groupDevicesBar: Object,
+    groupSelect: {
+      type: Number,
+      default: 10
+    }
   },
-  data: () => ({
-    itemSelected: 0
-  }),
+  // data: () => ({
+  //   itemSelected: 0
+  // }),
   methods: {
     select: function (index) {
-      this.itemSelected = index
+      // this.itemSelected = index
       this.$emit('rowSelect', this.groupDevicesBar[index].entity)
     }
   }

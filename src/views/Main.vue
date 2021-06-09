@@ -1,7 +1,7 @@
 <template>
   <div class="main">
     <Header />
-    <LeftBar :groupDevicesBar="groupDevices" @rowSelect="rowSelected" />
+    <LeftBar :groupDevicesBar="groupDevices" :groupSelect="selecteNode" @rowSelect="rowSelected" />
     <CentralBar :devicesBar="Devices" :node="selecteNode" />
     <RightBar />
   </div>
@@ -15,6 +15,7 @@ import CentralBar from '@/components/CentralBar'
 import RightBar from '@/components/RightBar'
 import axios from 'axios'
 import { Announcer } from '../components/element/announcer.js'
+import { useToast } from 'vue-toastification'
 
 export default {
   name: 'Main',
@@ -34,6 +35,7 @@ export default {
     rowSelected: function (event) {
       this.selecteNode = event
       this.getDevices()
+      history.pushState({}, null, `/node/${event}`)
     },
     getGroup: async function () {
       const resp = await axios.get('https://device-darsan.mol.net.ua/meta/node-stat')
@@ -53,23 +55,28 @@ export default {
     }
   },
   created: function () {
+    if (this.$route.params.id) {
+      this.selecteNode = Number(this.$route.params.id)
+    }
+
     const announcerEvents = {
       'poller.poll-completed': async (message) => {
-        console.log('poller.poll-completed')
         try {
           this.getGroup()
           this.getDevices()
         } catch (err) {
-          console.error('error in Main mounted')
+          console.error('error in poll-completed')
         }
       },
       'poller.loop': (message) => {
         console.log('poller.loop')
         console.log(message)
+        toast.info(message.text)
       },
       'poller.loop-syslog': (message) => {
         console.log('poller.loop-syslog')
         console.log(message)
+        toast.info(message.text)
       },
       'poller.in-errors': (message) => {
         console.log('poller.in-errors')
@@ -84,24 +91,28 @@ export default {
         console.log(message)
       },
       'announcer.alert': (message) => {
-        console.log('poller.alert')
+        console.log('announcer.alert')
         console.log(message)
       },
       'announcer.test': (message) => {
-        console.log('poller.test')
+        console.log('announcer.test')
         console.log(message)
       }
     }
 
+    const toast = useToast()
+
     this.wss = new Announcer(['poller.*', 'announcer.*'], announcerEvents, {
       onOpen: () => {
-        console.log('Уведомления включены')
+        // toast.info('Уведомления включены', { timeout: 3000 })
       },
       onError: (err) => {
+        toast.info('wssError' + err)
         console.log('wssError' + err)
       },
       onClose: () => {
-        console.log('Соединение с сервером "+url+" потеряно. Уведомления будут недоступны')
+        toast.info('Соединение с сервером потеряно. Уведомления будут недоступны', { bodyClassName: ['custom-class-1'] })
+        console.log('Соединение с сервером потеряно. Уведомления будут недоступны', { bodyClassName: ['custom-class-1'] })
       }
     })
   },

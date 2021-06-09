@@ -4,6 +4,10 @@
     outline: 1px solid black;
 }
 
+.Vue-Toastification__toast-body.custom-class-1 {
+    font-size: 15px;
+}
+
 :focus {outline:none;}
 ::-moz-focus-inner {border:0;}
 body {
@@ -409,6 +413,8 @@ div#main-menu-left {
     float: left;
     width: 30%;
     min-width: 140px;
+    margin-top: 3px;
+    margin-left: 10px   ;
 }
 div#main-menu-right {
     float: right;
