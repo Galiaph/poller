@@ -71,12 +71,12 @@ export default {
       'poller.loop': (message) => {
         console.log('poller.loop')
         console.log(message)
-        toast.info(message.text)
+        toast.info(message.text, { bodyClassName: ['custom-class-1'] })
       },
       'poller.loop-syslog': (message) => {
         console.log('poller.loop-syslog')
         console.log(message)
-        toast.info(message.text)
+        toast.info(message.text, { bodyClassName: ['custom-class-1'] })
       },
       'poller.in-errors': (message) => {
         console.log('poller.in-errors')

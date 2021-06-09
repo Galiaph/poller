@@ -135,13 +135,10 @@ export default {
       try {
         const res = await axios.get(`https://device-darsan.mol.net.ua/device/${this.switch}/port/${port}/status`)
         stat = !res.data.status
-        console.log('port: ' + port + ' status: ' + res.data.status)
         if (this.portStatus(port - 1) === 'port-trunk') {
           toast.info('Нельзя выключать транковый порт!', { timeout: 3000, bodyClassName: ['custom-class-1'] })
         } else {
           const resp = await axios.patch(`https://device-darsan.mol.net.ua/device/${this.switch}/port/${port}/status`, { status: stat })
-          console.log(resp.data)
-
           if (resp.data.status === stat) {
             toast.info(`Порт ${port} ${stat ? 'включен' : 'выключен'}`, { timeout: 3000, bodyClassName: ['custom-class-1'] })
           }
