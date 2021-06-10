@@ -10,7 +10,7 @@ const app = createApp(App)
 
 const options = {
   transition: 'Vue-Toastification__fade',
-  maxToasts: 20,
+  maxToasts: 10,
   newestOnTop: true,
   position: 'bottom-right',
   timeout: false,
@@ -24,6 +24,8 @@ const options = {
   closeButton: false,
   icon: false,
   rtl: false,
+  bodyClassName: 'custom-class-1',
+  toastClassName: 'custom-class-2',
   filterBeforeCreate: (toast, toasts) => {
     if (toasts.filter(
       t => (t.content === toast.content)
@@ -71,7 +73,7 @@ const errorInterceptor = async error => {
 
     case 403:
       console.error(error.response.status, error.message)
-      toast.error(error.response.data, { timeout: 3000, bodyClassName: ['custom-class-1'] })
+      toast.error(error.response.data, { timeout: 3000 })
       await store.dispatch('logout')
       router.push('/login')
       break

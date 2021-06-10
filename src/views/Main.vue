@@ -71,12 +71,12 @@ export default {
       'poller.loop': (message) => {
         console.log('poller.loop')
         console.log(message)
-        toast.info(message.text, { bodyClassName: ['custom-class-1'] })
+        toast.info(message.text)
       },
       'poller.loop-syslog': (message) => {
         console.log('poller.loop-syslog')
         console.log(message)
-        toast.info(message.text, { bodyClassName: ['custom-class-1'] })
+        toast.info(message.text)
       },
       'poller.in-errors': (message) => {
         console.log('poller.in-errors')
@@ -111,8 +111,8 @@ export default {
         console.log('wssError' + err)
       },
       onClose: () => {
-        toast.info('Соединение с сервером потеряно. Уведомления будут недоступны', { bodyClassName: ['custom-class-1'] })
-        console.log('Соединение с сервером потеряно. Уведомления будут недоступны', { bodyClassName: ['custom-class-1'] })
+        toast.info('Соединение с сервером потеряно. Уведомления будут недоступны')
+        console.log('Соединение с сервером потеряно. Уведомления будут недоступны')
       }
     })
   },

@@ -5,7 +5,13 @@
 }
 
 .Vue-Toastification__toast-body.custom-class-1 {
-    font-size: 15px;
+    font-size: 13px;
+    line-height: 18px;
+    max-width: 300px;
+}
+
+.Vue-Toastification__toast.custom-class-2 {
+    padding: 12px 14px;
 }
 
 :focus {outline:none;}
@@ -414,7 +420,7 @@ div#main-menu-left {
     width: 30%;
     min-width: 140px;
     margin-top: 3px;
-    margin-left: 10px   ;
+    margin-left: 10px;
 }
 div#main-menu-right {
     float: right;

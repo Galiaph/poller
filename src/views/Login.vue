@@ -44,13 +44,13 @@ export default {
       const toast = useToast()
 
       if (!username) {
-        toast.info('Введите логин', { timeout: 3000, bodyClassName: ['custom-class-1'] })
+        toast.info('Введите логин', { timeout: 3000, toastClassName: '' })
         // this.error = 'Введите логин'
         return
       }
 
       if (!password) {
-        toast.info('Введите пароль', { timeout: 3000, bodyClassName: ['custom-class-1'] })
+        toast.info('Введите пароль', { timeout: 3000, toastClassName: '' })
         // this.error = 'Введите пароль'
         return
       }
@@ -67,7 +67,7 @@ export default {
         this.$router.push('/')
       } catch (err) {
         this.$store.commit('auth_error')
-        toast.error(err.response.data, { timeout: 3000, bodyClassName: ['custom-class-1'] })
+        toast.error(err.response.data, { timeout: 3000 })
       }
     }
   }

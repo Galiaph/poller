@@ -127,7 +127,7 @@ export default {
       const toast = useToast()
 
       if (this.data.state === 'down') {
-        toast.info('Нельзя выключить порт на не работающем свитче!', { timeout: 3000, bodyClassName: ['custom-class-1'] })
+        toast.info('Нельзя выключить порт на не работающем свитче!', { timeout: 3000 })
         return
       }
       let stat = false
@@ -136,15 +136,15 @@ export default {
         const res = await axios.get(`https://device-darsan.mol.net.ua/device/${this.switch}/port/${port}/status`)
         stat = !res.data.status
         if (this.portStatus(port - 1) === 'port-trunk') {
-          toast.info('Нельзя выключать транковый порт!', { timeout: 3000, bodyClassName: ['custom-class-1'] })
+          toast.info('Нельзя выключать транковый порт!', { timeout: 3000 })
         } else {
           const resp = await axios.patch(`https://device-darsan.mol.net.ua/device/${this.switch}/port/${port}/status`, { status: stat })
           if (resp.data.status === stat) {
-            toast.info(`Порт ${port} ${stat ? 'включен' : 'выключен'}`, { timeout: 3000, bodyClassName: ['custom-class-1'] })
+            toast.info(`Порт ${port} ${stat ? 'включен' : 'выключен'}`, { timeout: 3000 })
           }
         }
       } catch (err) {
-        toast.error(`Не получилось ${stat ? 'включить' : 'выключить'} порт`, { timeout: 3000, bodyClassName: ['custom-class-1'] })
+        toast.error(`Не получилось ${stat ? 'включить' : 'выключить'} порт`, { timeout: 3000 })
       }
     },
     select: function (port, event) {
