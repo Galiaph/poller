@@ -22,6 +22,7 @@
             <input type="text" name="tag-text" v-model="tag" v-if="isEditTag" @keydown.esc="tagEsc" @keypress.enter="tagEdit" autofocus/>
           </div>
           <select id="graph-duration" v-model="period">
+            <option value="hour6">6 часов</option>
             <option value="day">1 день</option>
             <option value="2day" selected>2 дня</option>
             <option value="week">Неделя</option>
@@ -34,6 +35,15 @@
         </div>
         <div>
           <img :src="error" alt="График недоступен"/>
+        </div>
+        <div>
+          <img :src="unicast" alt="График недоступен"/>
+        </div>
+        <div>
+          <img :src="multicast" alt="График недоступен"/>
+        </div>
+        <div>
+          <img :src="broadcast" alt="График недоступен"/>
         </div>
       </div>
     </div>
@@ -89,6 +99,18 @@ export default {
     }
   },
   computed: {
+    broadcast: function () {
+      const token = encodeURIComponent(this.$store.getters.getToken)
+      return `https://device-darsan.mol.net.ua/switch/${this.switch}/port/${this.port}/graph/broadcast?period=${this.period}&darsan2=${token}`
+    },
+    multicast: function () {
+      const token = encodeURIComponent(this.$store.getters.getToken)
+      return `https://device-darsan.mol.net.ua/switch/${this.switch}/port/${this.port}/graph/multicast?period=${this.period}&darsan2=${token}`
+    },
+    unicast: function () {
+      const token = encodeURIComponent(this.$store.getters.getToken)
+      return `https://device-darsan.mol.net.ua/switch/${this.switch}/port/${this.port}/graph/unicast?period=${this.period}&darsan2=${token}`
+    },
     traffic: function () {
       const token = encodeURIComponent(this.$store.getters.getToken)
       return `https://device-darsan.mol.net.ua/switch/${this.switch}/port/${this.port}/graph/traffic?period=${this.period}&darsan2=${token}`

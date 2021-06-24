@@ -3,10 +3,13 @@
      <div id="header-menu">
        <div id="main-menu">
          <div id="main-menu-left">
-           <a class="main-menu-item" href="">
+           <a class="main-menu-item" href="/">
              Устройства
            </a>
-           <a href="#menu-data-dropdown" class="fg-button-icon-right ui-widget ui-corner-all main-menu-item" id="menu-data">
+           <a href="/loop" class="main-menu-item">
+             Петли
+           </a>
+           <!-- <a href="#menu-data-dropdown" class="fg-button-icon-right ui-widget ui-corner-all main-menu-item" id="menu-data">
              Списки
            </a>
            <div id="menu-data-dropdown" style="display: none">
@@ -43,7 +46,7 @@
                <li><a href="">Карта</a></li>
                <li><a href="">Что нового?</a></li>
              </ul>
-           </div>
+           </div> -->
          </div>
          <div id="main-menu-right">
            <div id="site-search">
