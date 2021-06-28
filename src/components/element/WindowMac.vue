@@ -28,7 +28,7 @@
                       <th>MAC</th>
                       <th>vlan</th>
                       <th>Время</th>
-                      <th onclick="$('.pingAllWs').trigger('click')" style="cursor: pointer;">Ping</th>
+                      <th @click="pingAll" style="cursor: pointer;">Ping</th>
                     </tr>
                 </thead>
                 <tbody id="table-stuff">
@@ -49,7 +49,7 @@
                           {{ time(item.duration) }}
                         </td>
                         <td class="ping-cell">
-                          <span>-</span>
+                          <span v-html="ping(item.ping)"></span>
                         </td>
                     </tr>
                 </tbody>
@@ -109,6 +109,45 @@ export default {
     }
   },
   methods: {
+    ping: function (item) {
+      if (!item || item === '') {
+        return '<span>-</span>'
+      }
+
+      let str = ''
+      for (let i = 0; i < item.length; i++) {
+        if (item[i] === '1') {
+          str += '<span style="color: green;">&bull;</span>'
+        } else if (item[i] === '0') {
+          str += '<span style="color: red;">&bull;</span>'
+        }
+      }
+
+      return str
+    },
+    pingAll: function () {
+      this.users.forEach(el => {
+        el.ping = ''
+
+        const url = `wss://ping.mol.net.ua/ip/${el.ip}?packet=1400`
+        el.ws = new WebSocket(url)
+
+        el.ws.onmessage = (msg) => {
+          const message = JSON.parse(msg.data)
+
+          if (el.ping.length > 3) {
+            el.ws.close()
+            el.ws = null
+          }
+
+          if (message.reply === 'OK' || message.reply === 'MALFORMED') {
+            el.ping += '1'
+          } else if (message.reply === 'TIMEOUT') {
+            el.ping += '0'
+          }
+        }
+      })
+    },
     time: function (duration) {
       if (duration === null) {
         return '-'
