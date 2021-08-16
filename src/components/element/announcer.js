@@ -25,3 +25,20 @@ export const Announcer = (topics, events, options) => {
 
   return ws
 }
+
+export const Connect = (wss, toast, announcerEvents) => {
+  wss = new Announcer(['poller.*', 'announcer.*'], announcerEvents, {
+    onOpen: () => {
+      // toast.info('Уведомления включены', { timeout: 3000 })
+    },
+    onError: (err) => {
+      toast.info('wssError' + err)
+      console.log('wssError' + err)
+    },
+    onClose: () => {
+      // toast.info('Соединение с сервером потеряно. Уведомления будут недоступны')
+      console.log('Соединение с сервером потеряно. Реконнект')
+      Connect(wss, toast, announcerEvents)
+    }
+  })
+}

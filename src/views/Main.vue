@@ -1,8 +1,8 @@
 <template>
   <div class="main">
     <Header />
-    <LeftBar :groupDevicesBar="groupDevices" :groupSelect="selecteNode" @rowSelect="rowSelected" />
-    <CentralBar :devicesBar="Devices" :node="selecteNode" />
+    <LeftBar :groupDevicesBar="groupDevices" :groupSelect="selecteNode" :ponSelect="selectTab" @rowSelect="rowSelected" />
+    <CentralBar :devicesBar="Devices" :node="selecteNode" :ponSelect="selectTab" @tabSelect="tabSelected" />
     <RightBar />
   </div>
 </template>
@@ -14,7 +14,7 @@ import LeftBar from '@/components/LeftBar'
 import CentralBar from '@/components/CentralBar'
 import RightBar from '@/components/RightBar'
 import axios from 'axios'
-import { Announcer } from '../components/element/announcer.js'
+import { Connect } from '../components/element/announcer.js'
 import { useToast } from 'vue-toastification'
 
 export default {
@@ -27,6 +27,7 @@ export default {
   },
   data: () => ({
     selecteNode: 10,
+    selectTab: false,
     groupDevices: {},
     Devices: {},
     wss: null
@@ -35,14 +36,26 @@ export default {
     rowSelected: function (event) {
       this.selecteNode = event
       this.getDevices()
-      history.pushState({}, null, `/node/${event}`)
+
+      history.pushState({}, null, `/${this.selectTab ? 'pon' : 'node'}/${event}`)
+    },
+    tabSelected: function (event) {
+      this.selectTab = event
+
+      if (this.selectTab && this.groupDevices.find((el) => el.entity === this.selecteNode).pon === '0') {
+        this.selecteNode = 12
+      }
+
+      history.pushState({}, null, `/${this.selectTab ? 'pon' : 'node'}/${this.selecteNode}`)
+
+      this.getDevices()
     },
     getGroup: async function () {
       const resp = await axios.get('https://device-darsan.mol.net.ua/meta/node-stat')
       this.groupDevices = resp.data
     },
     getDevices: async function () {
-      const resp = await axios.get(`https://device-darsan.mol.net.ua/switch?query=node IN (${this.selecteNode})`)
+      const resp = await axios.get(`https://device-darsan.mol.net.ua/${this.selectTab ? 'pon' : 'switch'}?query=node IN (${this.selecteNode})`)
       this.Devices = resp.data.sort((a, b) => {
         if (a.name > b.name) {
           return 1
@@ -101,20 +114,7 @@ export default {
     }
 
     const toast = useToast()
-
-    this.wss = new Announcer(['poller.*', 'announcer.*'], announcerEvents, {
-      onOpen: () => {
-        // toast.info('Уведомления включены', { timeout: 3000 })
-      },
-      onError: (err) => {
-        toast.info('wssError' + err)
-        console.log('wssError' + err)
-      },
-      onClose: () => {
-        toast.info('Соединение с сервером потеряно. Уведомления будут недоступны')
-        console.log('Соединение с сервером потеряно. Уведомления будут недоступны')
-      }
-    })
+    Connect(this.wss, toast, announcerEvents)
   },
   mounted: async function () {
     try {

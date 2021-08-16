@@ -55,7 +55,6 @@ import axios from 'axios'
 export default {
   name: 'WindowRRD',
   props: {
-    // active: Boolean,
     pageX: {
       type: String,
       default: '0px'
@@ -79,7 +78,8 @@ export default {
     port: {
       type: Number,
       default: 0
-    }
+    },
+    isPon: Boolean
   },
   data () {
     return {
@@ -101,23 +101,23 @@ export default {
   computed: {
     broadcast: function () {
       const token = encodeURIComponent(this.$store.getters.getToken)
-      return `https://device-darsan.mol.net.ua/switch/${this.switch}/port/${this.port}/graph/broadcast?period=${this.period}&darsan2=${token}`
+      return `https://device-darsan.mol.net.ua/${this.isPon ? 'pon' : 'switch'}/${this.switch}/port/${this.port}/graph/broadcast?period=${this.period}&darsan2=${token}`
     },
     multicast: function () {
       const token = encodeURIComponent(this.$store.getters.getToken)
-      return `https://device-darsan.mol.net.ua/switch/${this.switch}/port/${this.port}/graph/multicast?period=${this.period}&darsan2=${token}`
+      return `https://device-darsan.mol.net.ua/${this.isPon ? 'pon' : 'switch'}/${this.switch}/port/${this.port}/graph/multicast?period=${this.period}&darsan2=${token}`
     },
     unicast: function () {
       const token = encodeURIComponent(this.$store.getters.getToken)
-      return `https://device-darsan.mol.net.ua/switch/${this.switch}/port/${this.port}/graph/unicast?period=${this.period}&darsan2=${token}`
+      return `https://device-darsan.mol.net.ua/${this.isPon ? 'pon' : 'switch'}/${this.switch}/port/${this.port}/graph/unicast?period=${this.period}&darsan2=${token}`
     },
     traffic: function () {
       const token = encodeURIComponent(this.$store.getters.getToken)
-      return `https://device-darsan.mol.net.ua/switch/${this.switch}/port/${this.port}/graph/traffic?period=${this.period}&darsan2=${token}`
+      return `https://device-darsan.mol.net.ua/${this.isPon ? 'pon' : 'switch'}/${this.switch}/port/${this.port}/graph/traffic?period=${this.period}&darsan2=${token}`
     },
     error: function () {
       const token = encodeURIComponent(this.$store.getters.getToken)
-      return `https://device-darsan.mol.net.ua/switch/${this.switch}/port/${this.port}/graph/error?period=${this.period}&darsan2=${token}`
+      return `https://device-darsan.mol.net.ua/${this.isPon ? 'pon' : 'switch'}/${this.switch}/port/${this.port}/graph/error?period=${this.period}&darsan2=${token}`
     }
   },
   methods: {
@@ -130,7 +130,7 @@ export default {
     async tagEdit () {
       this.isEditTag = false
       try {
-        await axios.put(`https://device-darsan.mol.net.ua/switch/${this.switch}/port/${this.port}/tag`, { port: this.port, tag: this.tag })
+        await axios.put(`https://device-darsan.mol.net.ua/${this.isPon ? 'pon' : 'switch'}/${this.switch}/port/${this.port}/tag`, { port: this.port, tag: this.tag })
       } catch (err) {
         console.error('error in WindowRRD mounted')
       }
@@ -245,7 +245,7 @@ export default {
   // },
   created: async function () {
     try {
-      const resp = await axios.get(`https://device-darsan.mol.net.ua/switch/${this.switch}/port/${this.port}/tag`)
+      const resp = await axios.get(`https://device-darsan.mol.net.ua/${this.isPon ? 'pon' : 'switch'}/${this.switch}/port/${this.port}/tag`)
       this.tag = resp.data.tag || 'empty'
       this.tagOld = resp.data.tag || 'empty'
     } catch (err) {

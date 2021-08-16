@@ -2,14 +2,11 @@
   <div class="central-bar" id="central-bar">
     <div  id="tabs-device" class="ui-tabs ui-widget ui-widget-content ui-corner-all">
       <ul style="line-height: 1;" class="ui-tabs-nav ui-helper-reset ui-helper-clearfix ui-widget-header ui-corner-all">
-        <li class="ui-state-default ui-corner-top ui-tabs-active ui-state-active">
-          <a href="" style="padding-top: 3px;padding-bottom: 3px;" class="ui-tabs-anchor" >Проводные</a>
+        <li :class="ponSelect ? 'ui-state-default ui-corner-top' : 'ui-state-default ui-corner-top ui-tabs-active ui-state-active'">
+          <a href="#" @click="select(false)" style="padding-top: 3px;padding-bottom: 3px;" class="ui-tabs-anchor" >Проводные</a>
         </li>
-        <li class="ui-state-default ui-corner-top">
-          <a href="" style="padding-left: 13px;padding-top: 3px;padding-bottom: 3px;" class="ui-corner-all">Радио</a>
-        </li>
-        <li class="ui-state-default ui-corner-top">
-          <a href="" style="padding-left: 13px;padding-top: 3px;padding-bottom: 3px;" class="ui-corner-all">GPON</a>
+        <li :class="ponSelect ? 'ui-state-default ui-corner-top ui-tabs-active ui-state-active' : 'ui-state-default ui-corner-top'">
+          <a href="#" @click="select(true)" style="padding-left: 13px;padding-top: 3px;padding-bottom: 3px;" class="ui-corner-all">GPON</a>
         </li>
       </ul>
       <div id="wired" style="padding-left: 0px; padding-right: 0px;" class="ui-tabs-panel ui-widget-content ui-corner-bottom">
@@ -39,7 +36,7 @@
     </div>
   </div>
   <template v-for="block in windows.content" :key="block">
-    <component :is="block.component" @clickClose="closeWindow(block)" :block="block" :pageX="block.pageX" :pageY="block.pageY" :switch="block.switch" :port="block.port" @selectport="createWindowRRD(block, $event)" @selectmac="createWindowMac(block, $event)" @selectoldmac="createWindowOldMac(block, $event)"></component>
+    <component :is="block.component" @clickClose="closeWindow(block)" :block="block" :pageX="block.pageX" :pageY="block.pageY" :switch="block.switch" :port="block.port" :isPon="block.isPon" @selectport="createWindowRRD(block, $event)" @selectmac="createWindowMac(block, $event)" @selectoldmac="createWindowOldMac(block, $event)"></component>
   </template>
 </template>
 
@@ -67,9 +64,13 @@ export default {
   }),
   props: {
     devicesBar: Object,
-    node: Number
+    node: Number,
+    ponSelect: Boolean
   },
   methods: {
+    select: function (val) {
+      this.$emit('tabSelect', val)
+    },
     createWindow: function (item, event) {
       if (this.windows.content.find((el) => el.switch === item.entity)) {
         return
@@ -104,6 +105,7 @@ export default {
         component: 'Window',
         pageX: x + 'px',
         pageY: y + 'px',
+        isPon: this.ponSelect,
         switch: item.entity
       })
     },
@@ -142,6 +144,7 @@ export default {
         pageX: x + 'px',
         pageY: y + 'px',
         switch: swt,
+        isPon: this.ponSelect,
         port: port
       })
     },

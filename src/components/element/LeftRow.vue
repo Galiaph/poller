@@ -1,5 +1,5 @@
 <template>
-  <div :class="isSelected ? 'group-box-selected' : 'group-box'">
+  <div :class="isSelected ? 'group-box-selected' : 'group-box'" v-if="show(data)">
     <div class="group-header">
       <div class="group-header-wrapper">
         <div class="group-status-min" :class="minState" v-if="!isSelected"></div>
@@ -48,6 +48,7 @@ export default {
   name: 'LeftRow',
   props: {
     isSelected: Boolean,
+    isPon: Boolean,
     data: Object
   },
   computed: {
@@ -74,6 +75,13 @@ export default {
     }
   },
   methods: {
+    show: function (el) {
+      if (this.isPon && el.pon === '0') {
+        return false
+      }
+
+      return true
+    },
     select: function () {
       this.$emit('selected')
     }

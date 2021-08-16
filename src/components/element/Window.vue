@@ -22,7 +22,7 @@
             <!-- <img src="/images/site/popup_close.png" @click.stop="$emit('clickClose')"> -->
         </div>
         <div class="window-body" style="height: 205px;">
-          <img src="/images/site/vinyl.png" width="20" @click="isShowOldMacs = !isShowOldMacs" />
+          <img src="/images/site/vinyl.png" width="20" @click="isShowOldMacs = !isShowOldMacs" v-if="!isPon" />
           <table class="device-details">
             <tbody>
               <tr>
@@ -75,7 +75,6 @@ import { useToast } from 'vue-toastification'
 export default {
   name: 'Window',
   props: {
-    // active: Boolean,
     pageX: {
       type: String,
       default: '0px'
@@ -95,7 +94,8 @@ export default {
     switch: {
       type: Number,
       default: null
-    }
+    },
+    isPon: Boolean
   },
   data () {
     return {
@@ -125,6 +125,11 @@ export default {
   methods: {
     changePort: async function (port) {
       const toast = useToast()
+
+      if (this.isPon) {
+        toast.info('Нельзя выключить поры на голове!', { timeout: 3000 })
+        return
+      }
 
       if (this.data.state === 'down') {
         toast.info('Нельзя выключить порт на не работающем свитче!', { timeout: 3000 })
@@ -163,9 +168,17 @@ export default {
       return this.data.down ? formatUptimeFromStart(this.data.down_from, true) : formatUptime(this.data.uptime, true, (this.data.uptime > 864000))
     },
     currentMacsCount: function (index) {
+      if (this.isPon) {
+        return ''
+      }
+
       return this.data.current_macs_count[index] === 0 ? '' : this.data.current_macs_count[index]
     },
     oldMacsCount: function (index) {
+      if (this.isPon) {
+        return ''
+      }
+
       return this.data.old_macs_count[index] === 0 ? '' : this.data.old_macs_count[index]
     },
     statusDev () {
@@ -297,7 +310,7 @@ export default {
   // },
   created: async function () {
     try {
-      const resp = await axios.get(`https://device-darsan.mol.net.ua/switch/${this.switch}`)
+      const resp = await axios.get(`https://device-darsan.mol.net.ua/${this.isPon ? 'pon' : 'switch'}/${this.switch}`)
       this.data = resp.data
       // console.log(resp.data)
     } catch (err) {
