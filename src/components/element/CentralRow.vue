@@ -33,7 +33,7 @@
       {{ data.access_vlan }}
     </td>
     <td class="item-box-data device-vlan2" align="right">
-      <!--0-->
+      {{ data.ipoe_vlan }}
     </td>
     <td class="item-box-actions">
       <a class="modal" title="Свойства" href="#"><img src="/images/site/edit_n.png"></a>

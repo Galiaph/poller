@@ -35,6 +35,7 @@
                     <tr v-for="(item, index) in users" :data="item" :key="item" :class="index % 2 ? 'odd stuff' : 'even stuff'">
                         <td class="image">
                           <img :src="'/images/site/st_' + userState(item) + '.png'" :title="item.connection_type">
+                          <span style="font-size: 9px">{{ " " + item.connection_type }}</span>
                         </td>
                         <td class="login">
                           <a class="show-hidden" :href="'https://radix.mol.net.ua/client/' + item.uid" v-if="item.uid" target="_blank">{{  item.login }}</a>
@@ -90,6 +91,10 @@ export default {
     port: {
       type: Number,
       default: 0
+    },
+    node: {
+      type: Number,
+      default: null
     }
   },
   data () {
@@ -105,7 +110,8 @@ export default {
       fdb: [],
       users: [],
       fdbCount: 0,
-      usersCount: 0
+      usersCount: 0,
+      site: 'mol.net.ua'
     }
   },
   methods: {
@@ -281,7 +287,11 @@ export default {
       this.fdb.forEach(element => {
         macs.push(element.mac.replaceAll(':', ''))
       })
-      const resp2 = await axios.post('https://client-darsan.mol.net.ua/clients-from-macs', 'macs=' + macs.join(','))
+
+      if (this.node === 15) {
+        this.site = 'ot.dn.ua'
+      }
+      const resp2 = await axios.post(`https://client-darsan.${this.site}/clients-from-macs`, 'macs=' + macs.join(','))
       this.users = resp2.data
       this.usersCount = this.users.length
 

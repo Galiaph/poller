@@ -72,6 +72,10 @@ export default {
       this.selecteNode = Number(this.$route.params.id)
     }
 
+    if (this.$route.href && this.$route.href.split('/')[1] === 'pon') {
+      this.selectTab = true
+    }
+
     const announcerEvents = {
       'poller.poll-completed': async (message) => {
         try {

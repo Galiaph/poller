@@ -54,7 +54,7 @@
                           <a class="macs-count" href="" @click.prevent.stop="selectMac(index + 1, $event)">{{ currentMacsCount(index + 1) }}</a>
                         </div>
                         <div class="device-port-num drop-down-win">
-                          <a class="graph-link" :class="portStatus(index)" href="" @dblclick.prevent.stop="changePort(index)" @click.prevent.stop="select(index + 1, $event)" :title="index">{{ index + 1 }}</a>
+                          <a class="graph-link" :class="portStatus(index)" href="" @dblclick.prevent.stop="changePort(index)" @click.prevent.stop="select(index + 1, $event)" :title="index + 1">{{ index + 1 }}</a>
                         </div>
                       </div>
                     </template>
@@ -198,7 +198,7 @@ export default {
           return 'port-trunk'
         }
       }
-      return 'port-off'
+      return this.data.ports_adm_on[index] === '0' ? 'port-disable' : 'port-off'
     },
     getThisWindowAndHeaderElements () {
       return {

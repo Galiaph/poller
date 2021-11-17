@@ -36,7 +36,7 @@
     </div>
   </div>
   <template v-for="block in windows.content" :key="block">
-    <component :is="block.component" @clickClose="closeWindow(block)" :block="block" :pageX="block.pageX" :pageY="block.pageY" :switch="block.switch" :port="block.port" :isPon="block.isPon" @selectport="createWindowRRD(block, $event)" @selectmac="createWindowMac(block, $event)" @selectoldmac="createWindowOldMac(block, $event)"></component>
+    <component :is="block.component" @clickClose="closeWindow(block)" :block="block" :pageX="block.pageX" :pageY="block.pageY" :switch="block.switch" :port="block.port" :isPon="block.isPon" :node="block.node" @selectport="createWindowRRD(block, $event)" @selectmac="createWindowMac(block, $event)" @selectoldmac="createWindowOldMac(block, $event)"></component>
   </template>
 </template>
 
@@ -144,7 +144,7 @@ export default {
         pageX: x + 'px',
         pageY: y + 'px',
         switch: swt,
-        isPon: this.ponSelect,
+        isPon: item.isPon,
         port: port
       })
     },
@@ -183,7 +183,8 @@ export default {
         pageX: x + 'px',
         pageY: y + 'px',
         switch: swt,
-        port: port
+        port: port,
+        node: this.node
       })
     },
     createWindowOldMac: function (item, { event, swt, port }) {
@@ -221,7 +222,8 @@ export default {
         pageX: x + 'px',
         pageY: y + 'px',
         switch: swt,
-        port: port
+        port: port,
+        node: this.node
       })
     },
     closeWindow: function (item) {

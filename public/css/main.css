@@ -633,10 +633,10 @@ div.device-port-num a.port-trunk:link {
     color: #F29100;
     font-weight: bold;
 }
-div.device-port-num a.port-loop:active,
-div.device-port-num a.port-loop:visited,
-div.device-port-num a.port-loop:hover,
-div.device-port-num a.port-loop:link {
+div.device-port-num a.port-disable:active,
+div.device-port-num a.port-disable:visited,
+div.device-port-num a.port-disable:hover,
+div.device-port-num a.port-disable:link {
     text-decoration: none;
     color: #FF0000;
     font-weight: bold;
