@@ -90,6 +90,10 @@ export default {
     port: {
       type: Number,
       default: 0
+    },
+    node: {
+      type: Number,
+      default: null
     }
   },
   data () {
@@ -105,7 +109,8 @@ export default {
       fdb: [],
       users: [],
       fdbCount: 0,
-      usersCount: 0
+      usersCount: 0,
+      site: 'mol.net.ua'
     }
   },
   methods: {
@@ -242,7 +247,12 @@ export default {
       this.fdb.forEach(element => {
         macs.push(element.mac.replaceAll(':', ''))
       })
-      const resp2 = await axios.post('https://client-darsan.mol.net.ua/clients-from-macs', 'macs=' + macs.join(','))
+
+      if (this.node === 15) {
+        this.site = 'ot.dn.ua'
+      }
+
+      const resp2 = await axios.post(`https://client-darsan.${this.site}/clients-from-macs`, 'macs=' + macs.join(','))
       this.users = resp2.data
       this.usersCount = this.users.length
 
