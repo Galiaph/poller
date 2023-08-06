@@ -50,6 +50,7 @@ import WindowOldMac from './element/WindowOldMac.vue'
 
 export default {
   name: 'CentralBar',
+  emits: ['tabSelect'],
   components: {
     CentralRow,
     Window,

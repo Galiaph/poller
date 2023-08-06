@@ -5,6 +5,8 @@ import store from './store'
 import axios from 'axios'
 import Toast, { useToast } from 'vue-toastification'
 import 'vue-toastification/dist/index.css'
+import HighchartsVue from 'highcharts-vue'
+// import Highcharts from 'highcharts'
 
 const app = createApp(App)
 
@@ -87,4 +89,4 @@ const errorInterceptor = async error => {
 axios.interceptors.request.use(authInterceptor)
 axios.interceptors.response.use(undefined, errorInterceptor)
 
-app.use(store).use(router).use(Toast, options).mount('#app')
+app.use(store).use(router).use(Toast, options).use(HighchartsVue).mount('#app')

@@ -2,7 +2,7 @@
   <div class="main">
     <Header />
     <LeftBar :groupDevicesBar="groupDevices" :groupSelect="selecteNode" :ponSelect="selectTab" @rowSelect="rowSelected" />
-    <CentralBar :devicesBar="Devices" :node="selecteNode" :ponSelect="selectTab" @tabSelect="tabSelected" />
+    <CentralBar :devicesBar="Devices" :node="selecteNode" :ponSelect="selectTab" @tabSelect="tabSelected($event)" />
     <RightBar />
   </div>
 </template>
@@ -14,10 +14,11 @@ import LeftBar from '@/components/LeftBar'
 import CentralBar from '@/components/CentralBar'
 import RightBar from '@/components/RightBar'
 import axios from 'axios'
-import { Connect } from '../components/element/announcer.js'
+import Connects from '@/components/element/announcer.js'
 import { useToast } from 'vue-toastification'
 
 export default {
+  // eslint-disable-next-line
   name: 'Main',
   components: {
     Header,
@@ -118,7 +119,7 @@ export default {
     }
 
     const toast = useToast()
-    Connect(this.wss, toast, announcerEvents)
+    Connects.Connect(this.wss, toast, announcerEvents)
   },
   mounted: async function () {
     try {

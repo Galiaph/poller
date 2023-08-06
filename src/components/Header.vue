@@ -68,11 +68,11 @@
 
 <script>
 export default {
+  // eslint-disable-next-line
   name: 'Header',
   computed: {
     login_img () {
-      const token = encodeURIComponent(this.$store.getters.getToken)
-      return 'https://worker-darsan.mol.net.ua/worker/' + this.$store.getters.getLogin + '/avatar?darsan2=' + token
+      return 'https://radix.mol.net.ua/avatar/' + this.$store.getters.getLogin
     }
   },
   methods: {

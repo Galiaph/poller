@@ -31,6 +31,7 @@
 import { useToast } from 'vue-toastification'
 
 export default {
+  // eslint-disable-next-line
   name: 'Login',
   data: () => ({
     username: '',

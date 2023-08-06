@@ -22,38 +22,52 @@
             <input type="text" name="tag-text" v-model="tag" v-if="isEditTag" @keydown.esc="tagEsc" @keypress.enter="tagEdit" autofocus/>
           </div>
           <select id="graph-duration" v-model="period">
-            <option value="hour6">6 часов</option>
             <option value="day">1 день</option>
-            <option value="2day" selected>2 дня</option>
+            <option value="default" selected>По умолчанию</option>
             <option value="week">Неделя</option>
             <option value="month">Месяц</option>
             <option value="month3">3 Месяца</option>
           </select>
         </div>
         <div>
-          <img :src="traffic" alt="График недоступен"/>
+          <graph title="Трафик" yAxisTitle="Трафик (бит/c)" type="area" :series0="seriesTraffic0" :series1="seriesTraffic1" :values0="valuesTraffic0" :values1="valuesTraffic1" :upside1="true" />
         </div>
         <div>
-          <img :src="error" alt="График недоступен"/>
+          <graph title="Ошибки" yAxisTitle="Ошибки (пак/c)" type="area" :series0="seriesError0" :series1="seriesError1" :values0="valuesError0" :values1="valuesError1" :upside1="true" />
         </div>
         <div>
-          <img :src="unicast" alt="График недоступен"/>
+          <graph title="Сброшенные пакеты" yAxisTitle="Пакеты/c" type="area" :series0="seriesDiscard0" :series1="seriesDiscard1" :values0="valuesDiscard0" :values1="valuesDiscard1" :upside1="true" />
         </div>
         <div>
-          <img :src="multicast" alt="График недоступен"/>
+          <graph title="Unicast" yAxisTitle="Пакеты/c" type="area" :series0="seriesUnicast0" :series1="seriesUnicast1" :values0="valuesUnicast0" :values1="valuesUnicast1" :upside1="true" />
         </div>
         <div>
-          <img :src="broadcast" alt="График недоступен"/>
+          <graph title="Multicast" yAxisTitle="Пакеты/c" type="area" :series0="seriesMulticast0" :series1="seriesMulticast1" :values0="valuesMulticast0" :values1="valuesMulticast1" :upside1="true" />
+        </div>
+        <div>
+          <graph title="Broadcast" yAxisTitle="Пакеты/c" type="area" :series0="seriesBroadcast0" :series1="seriesBroadcast1" :values0="valuesBroadcast0" :values1="valuesBroadcast1" :upside1="true" />
         </div>
       </div>
     </div>
 </template>
 
 <script>
+// import moment from 'moment'
 import axios from 'axios'
+import Graph from './Graph.vue'
+
+const num = new Intl.NumberFormat('en', {
+  notation: 'compact',
+  compactDisplay: 'short',
+  minimumFractionDigits: 0,
+  maximumFractionDigits: 2
+})
 
 export default {
   name: 'WindowRRD',
+  components: {
+    Graph
+  },
   props: {
     pageX: {
       type: String,
@@ -94,30 +108,215 @@ export default {
       tag: '',
       tagOld: '',
       isEditTag: false,
-      period: '2day',
-      temp: '2day'
-    }
-  },
-  computed: {
-    broadcast: function () {
-      const token = encodeURIComponent(this.$store.getters.getToken)
-      return `https://device-darsan.mol.net.ua/${this.isPon ? 'pon' : 'switch'}/${this.switch}/port/${this.port}/graph/broadcast?period=${this.period}&darsan2=${token}`
-    },
-    multicast: function () {
-      const token = encodeURIComponent(this.$store.getters.getToken)
-      return `https://device-darsan.mol.net.ua/${this.isPon ? 'pon' : 'switch'}/${this.switch}/port/${this.port}/graph/multicast?period=${this.period}&darsan2=${token}`
-    },
-    unicast: function () {
-      const token = encodeURIComponent(this.$store.getters.getToken)
-      return `https://device-darsan.mol.net.ua/${this.isPon ? 'pon' : 'switch'}/${this.switch}/port/${this.port}/graph/unicast?period=${this.period}&darsan2=${token}`
-    },
-    traffic: function () {
-      const token = encodeURIComponent(this.$store.getters.getToken)
-      return `https://device-darsan.mol.net.ua/${this.isPon ? 'pon' : 'switch'}/${this.switch}/port/${this.port}/graph/traffic?period=${this.period}&darsan2=${token}`
-    },
-    error: function () {
-      const token = encodeURIComponent(this.$store.getters.getToken)
-      return `https://device-darsan.mol.net.ua/${this.isPon ? 'pon' : 'switch'}/${this.switch}/port/${this.port}/graph/error?period=${this.period}&darsan2=${token}`
+      period: 'default',
+      seriesTraffic0: {
+        name: 'Входящий',
+        color: 'green',
+        tooltip: {
+          valueDecimals: 0,
+          valueSuffix: ' бит/c'
+        }
+      },
+      seriesTraffic1: {
+        name: 'Исходящий',
+        color: 'blue',
+        tooltip: {
+          valueDecimals: 0,
+          valueSuffix: ' бит/c'
+        }
+      },
+      seriesError0: {
+        name: 'Ошибки RX',
+        color: 'orange',
+        tooltip: {
+          valueDecimals: 0,
+          valueSuffix: ' пак/c'
+        }
+      },
+      seriesError1: {
+        name: 'Ошибки TX',
+        color: 'red',
+        tooltip: {
+          valueDecimals: 0,
+          valueSuffix: ' пак/c'
+        }
+      },
+      seriesDiscard0: {
+        name: 'Входящие',
+        color: 'mediumpurple',
+        tooltip: {
+          valueDecimals: 0,
+          valueSuffix: ' пак/c'
+        }
+      },
+      seriesDiscard1: {
+        name: 'Исходящие',
+        color: 'goldenrod',
+        tooltip: {
+          valueDecimals: 0,
+          valueSuffix: ' пак/c'
+        }
+      },
+      seriesUnicast0: {
+        name: 'Входящие',
+        color: 'mediumpurple',
+        tooltip: {
+          valueDecimals: 0,
+          valueSuffix: ' пак/c'
+        }
+      },
+      seriesUnicast1: {
+        name: 'Исходящие',
+        color: 'goldenrod',
+        tooltip: {
+          valueDecimals: 0,
+          valueSuffix: ' пак/c'
+        }
+      },
+      seriesMulticast0: {
+        name: 'Входящие',
+        color: 'khaki',
+        tooltip: {
+          valueDecimals: 0,
+          valueSuffix: ' пак/c'
+        }
+      },
+      seriesMulticast1: {
+        name: 'Исходящие',
+        color: 'firebrick',
+        tooltip: {
+          valueDecimals: 0,
+          valueSuffix: ' пак/c'
+        }
+      },
+      seriesBroadcast0: {
+        name: 'Входящие',
+        color: 'darkgreen',
+        tooltip: {
+          valueDecimals: 0,
+          valueSuffix: ' пак/c'
+        }
+      },
+      seriesBroadcast1: {
+        name: 'Исходящие',
+        color: 'darkcyan',
+        tooltip: {
+          valueDecimals: 0,
+          valueSuffix: ' пак/c'
+        }
+      },
+      valuesTraffic0: { start: 0, step: 0, data: [] },
+      valuesTraffic1: { start: 0, step: 0, data: [] },
+      valuesError0: { start: 0, step: 0, data: [] },
+      valuesError1: { start: 0, step: 0, data: [] },
+      valuesDiscard0: { start: 0, step: 0, data: [] },
+      valuesDiscard1: { start: 0, step: 0, data: [] },
+      valuesUnicast0: { start: 0, step: 0, data: [] },
+      valuesUnicast1: { start: 0, step: 0, data: [] },
+      valuesMulticast0: { start: 0, step: 0, data: [] },
+      valuesMulticast1: { start: 0, step: 0, data: [] },
+      valuesBroadcast0: { start: 0, step: 0, data: [] },
+      valuesBroadcast1: { start: 0, step: 0, data: [] }
+      // trafficData: {
+      //   chart: {
+      //     type: 'area',
+      //     width: 615,
+      //     height: 250,
+      //     borderWidth: 1,
+      //     borderColor: 'lightgray',
+      //     borderRadius: 5,
+      //     zoomType: 'xy',
+      //     panning: true,
+      //     panKey: 'shift',
+      //     events: {
+      //       redraw: ev => { this.calcStat(ev.target) }
+      //     }
+      //     // style: {
+      //     //   fontSize: '1.55rem'
+      //     // },
+      //   },
+      //   lang: {
+      //     months: ['Janvier', 'F├®vrier', 'Mars', 'Avril', 'Mai', 'Juin', 'Juillet', 'Ao├╗t', 'Septembre', 'Octobre', 'Novembre', 'D├®cembre'],
+      //     weekdays: ['Dimanche', 'Lundi', 'Mardi', 'Mercredi', 'Jeudi', 'Vendredi', 'Samedi']
+      //   },
+      //   time: {
+      //     useUTC: false,
+      //     timezone: 'Europe/Moscow'
+      //   },
+      //   accessibility: {
+      //     enabled: false
+      //   },
+      //   title: {
+      //     text: 'Трафик',
+      //     style: {
+      //       fontSize: '10pt',
+      //       fontWeight: 'bold',
+      //       margin: 25
+      //     }
+      //   },
+      //   xAxis: {
+      //     type: 'datetime',
+      //     gridLineWidth: 1,
+      //     gridLineDashStyle: 'ShortDot',
+      //     minorTicks: true,
+      //     lineColor: 'black',
+      //     minorGridLineColor: '#FFDDDD',
+      //     minorTicksPerMajor: 3,
+      //     gridLineColor: 'darkgray',
+      //     dateTimeLabelFormats: {
+      //       day: '%a %d %b'
+      //     }
+      //   },
+      //   yAxis: {
+      //     title: {
+      //       text: 'Трафик (бит/c)'
+      //     },
+      //     gridLineWidth: 1,
+      //     gridLineDashStyle: 'ShortDot',
+      //     minorTicks: true,
+      //     lineColor: 'black',
+      //     minorGridLineColor: '#FFDDDD',
+      //     minorTicksPerMajor: 3,
+      //     gridLineColor: 'darkgray'
+      //   },
+      //   credits: {
+      //     enabled: false
+      //   },
+      //   legend: {
+      //     layout: 'vertical',
+      //     align: 'center',
+      //     x: -230
+      //   },
+      //   series: [{
+      //     name: 'Входящий',
+      //     data: [],
+      //     color: 'green',
+      //     marker: {
+      //       enabled: false
+      //     },
+      //     pointStart: 0,
+      //     pointInterval: 0,
+      //     showInLegend: true,
+      //     tooltip: {
+      //       valueDecimals: 0,
+      //       valueSuffix: ' бит/c'
+      //     }
+      //   }, {
+      //     name: 'Исходящий',
+      //     data: [],
+      //     color: 'blue',
+      //     marker: {
+      //       enabled: false
+      //     },
+      //     pointStart: 0,
+      //     pointInterval: 0,
+      //     showInLegend: true,
+      //     tooltip: {
+      //       valueDecimals: 0,
+      //       valueSuffix: ' бит/c'
+      //     }
+      //   }]
+      // }
     }
   },
   methods: {
@@ -125,6 +324,31 @@ export default {
       if (this.isEditTag) {
         this.isEditTag = false
         this.tag = this.tagOld
+      }
+    },
+    async getTraffic () {
+      try {
+        const resp = await axios.get(`https://device-darsan.mol.net.ua/${this.isPon ? 'pon' : 'switch'}/${this.switch}/port/${this.port}/data/traffic?period=${this.period}`)
+
+        this.valuesTraffic0 = { data: resp.data.series.input, start: resp.data.start, step: resp.data.step }
+        this.valuesTraffic1 = { data: resp.data.series.output, start: resp.data.start, step: resp.data.step }
+
+        this.valuesError0 = { data: resp.data.series.inerrors, start: resp.data.start, step: resp.data.step }
+        this.valuesError1 = { data: resp.data.series.outerrors, start: resp.data.start, step: resp.data.step }
+
+        this.valuesDiscard0 = { data: resp.data.series.indiscard, start: resp.data.start, step: resp.data.step }
+        this.valuesDiscard1 = { data: resp.data.series.outdiscard, start: resp.data.start, step: resp.data.step }
+
+        this.valuesUnicast0 = { data: resp.data.series.inucast, start: resp.data.start, step: resp.data.step }
+        this.valuesUnicast1 = { data: resp.data.series.outucast, start: resp.data.start, step: resp.data.step }
+
+        this.valuesMulticast0 = { data: resp.data.series.inmucast, start: resp.data.start, step: resp.data.step }
+        this.valuesMulticast1 = { data: resp.data.series.outmucast, start: resp.data.start, step: resp.data.step }
+
+        this.valuesBroadcast0 = { data: resp.data.series.inbrcast, start: resp.data.start, step: resp.data.step }
+        this.valuesBroadcast1 = { data: resp.data.series.outbrcast, start: resp.data.start, step: resp.data.step }
+      } catch (err) {
+        console.error('error in getTraffic')
       }
     },
     async tagEdit () {
@@ -192,7 +416,7 @@ export default {
     },
     sendWindowToHighest () {
       this.getThisWindowAndHeaderElements().window.style.zIndex = this.getHighestWindow() + 1
-    }
+    },
     // centerWindow () {
     //   const myElement = this.getThisWindowAndHeaderElements().window
     //   const pageWidth = window.innerWidth
@@ -231,8 +455,33 @@ export default {
     // show () {
     //   this.getThisWindowAndHeaderElements().window.style.display = 'block'
     // }
+    calcStat (chart) {
+      for (const [i, item] of chart.legend.allItems.entries()) {
+        let data = item.data.filter(point => point.isInside).map(point => point.y) // grab only points within the visible range
+        let label = item.name
+
+        if (data.length) {
+          if (i === 1) data = data.map(el => -el)
+
+          const last = data[data.length - 1]
+          const max = Math.max(...data)
+          const min = Math.min(...data)
+          const avg = data.reduce((a, b) => a + b, 0) / data.length
+
+          label += `: мин. ${num.format(min)};  макс. ${num.format(max)}; сред. ${num.format(avg)}; посл. ${num.format(last)}`
+        }
+
+        item.legendItem.label.element.innerHTML = label
+      }
+    }
   },
-  // watch: {
+  watch: {
+    period: {
+      deep: true,
+      handler (val) {
+        this.getTraffic()
+      }
+    }
   //   active (newValue) {
   //     if (newValue) {
   //       this.show()
@@ -242,7 +491,7 @@ export default {
   //       this.hide()
   //     }
   //   }
-  // },
+  },
   created: async function () {
     try {
       const resp = await axios.get(`https://device-darsan.mol.net.ua/${this.isPon ? 'pon' : 'switch'}/${this.switch}/port/${this.port}/tag`)
@@ -253,6 +502,7 @@ export default {
     }
   },
   mounted: function () {
+    this.getTraffic()
     this.dragElement()
     const _window = this.getThisWindowAndHeaderElements().window
     _window.addEventListener('click', () => {

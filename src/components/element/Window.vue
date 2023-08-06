@@ -73,6 +73,7 @@ import { formatUptime, formatUptimeFromStart } from './timeFunc.js'
 import { useToast } from 'vue-toastification'
 
 export default {
+  // eslint-disable-next-line
   name: 'Window',
   props: {
     pageX: {

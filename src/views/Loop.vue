@@ -34,6 +34,7 @@ import WindowOldMac from '@/components/element/WindowOldMac.vue'
 // import { useToast } from 'vue-toastification'
 
 export default {
+  // eslint-disable-next-line
   name: 'Loop',
   data: () => ({
     loopData: {},
