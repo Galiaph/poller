@@ -72,7 +72,7 @@ export default {
   name: 'Header',
   computed: {
     login_img () {
-      return 'https://radix.mol.net.ua/avatar/' + this.$store.getters.getLogin
+      return 'https://radix.mak.htel.cc/avatar/' + this.$store.getters.getLogin
     }
   },
   methods: {

@@ -52,7 +52,7 @@ export default {
   },
   methods: {
     getLoop: async function () {
-      const resp = await axios.get('https://device-darsan.mol.net.ua/srv/loop-log')
+      const resp = await axios.get('https://device-darsan.mak.htel.cc/srv/loop-log')
       this.loopData = resp.data
     },
     createWindow: function (item, event) {

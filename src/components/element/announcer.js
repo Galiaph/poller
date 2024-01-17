@@ -1,6 +1,6 @@
 export default {
   Announcer: function (topics, events, options) {
-    const url = 'wss://announcer.mol.net.ua'
+    const url = 'wss://announcer.mak.htel.cc'
     const ws = new WebSocket(url)
     ws.onopen = () => {
       topics.forEach(el => {

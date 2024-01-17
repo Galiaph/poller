@@ -320,7 +320,7 @@ export default {
     }
   },
   methods: {
-    tagEsc (event) {
+    tagEsc () {
       if (this.isEditTag) {
         this.isEditTag = false
         this.tag = this.tagOld
@@ -328,7 +328,7 @@ export default {
     },
     async getTraffic () {
       try {
-        const resp = await axios.get(`https://device-darsan.mol.net.ua/${this.isPon ? 'pon' : 'switch'}/${this.switch}/port/${this.port}/data/traffic?period=${this.period}`)
+        const resp = await axios.get(`https://device-darsan.mak.htel.cc/${this.isPon ? 'pon' : 'switch'}/${this.switch}/port/${this.port}/data/traffic?period=${this.period}`)
 
         this.valuesTraffic0 = { data: resp.data.series.input, start: resp.data.start, step: resp.data.step }
         this.valuesTraffic1 = { data: resp.data.series.output, start: resp.data.start, step: resp.data.step }
@@ -354,7 +354,7 @@ export default {
     async tagEdit () {
       this.isEditTag = false
       try {
-        await axios.put(`https://device-darsan.mol.net.ua/${this.isPon ? 'pon' : 'switch'}/${this.switch}/port/${this.port}/tag`, { port: this.port, tag: this.tag })
+        await axios.put(`https://device-darsan.mak.htel.cc/${this.isPon ? 'pon' : 'switch'}/${this.switch}/port/${this.port}/tag`, { port: this.port, tag: this.tag })
       } catch (err) {
         console.error('error in WindowRRD mounted')
       }
@@ -365,7 +365,7 @@ export default {
         windowHeader: window.document.getElementById(this.windowId + '-' + 'header')
       }
     },
-    dragElement (elmnt) {
+    dragElement () {
       const context = this
       let pos1 = 0
       let pos2 = 0
@@ -478,7 +478,7 @@ export default {
   watch: {
     period: {
       deep: true,
-      handler (val) {
+      handler () {
         this.getTraffic()
       }
     }
@@ -494,7 +494,7 @@ export default {
   },
   created: async function () {
     try {
-      const resp = await axios.get(`https://device-darsan.mol.net.ua/${this.isPon ? 'pon' : 'switch'}/${this.switch}/port/${this.port}/tag`)
+      const resp = await axios.get(`https://device-darsan.mak.htel.cc/${this.isPon ? 'pon' : 'switch'}/${this.switch}/port/${this.port}/tag`)
       this.tag = resp.data.tag || 'empty'
       this.tagOld = resp.data.tag || 'empty'
     } catch (err) {

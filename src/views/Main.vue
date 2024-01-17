@@ -52,11 +52,11 @@ export default {
       this.getDevices()
     },
     getGroup: async function () {
-      const resp = await axios.get('https://device-darsan.mol.net.ua/meta/node-stat')
+      const resp = await axios.get('https://device-darsan.mak.htel.cc/meta/node-stat')
       this.groupDevices = resp.data
     },
     getDevices: async function () {
-      const resp = await axios.get(`https://device-darsan.mol.net.ua/${this.selectTab ? 'pon' : 'switch'}?query=node IN (${this.selecteNode})`)
+      const resp = await axios.get(`https://device-darsan.mak.htel.cc/${this.selectTab ? 'pon' : 'switch'}?query=node IN (${this.selecteNode})`)
       this.Devices = resp.data.sort((a, b) => {
         if (a.name > b.name) {
           return 1
@@ -78,7 +78,7 @@ export default {
     }
 
     const announcerEvents = {
-      'poller.poll-completed': async (message) => {
+      'poller.poll-completed': async () => {
         try {
           this.getGroup()
           this.getDevices()

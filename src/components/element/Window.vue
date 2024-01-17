@@ -139,12 +139,12 @@ export default {
       let stat = false
 
       try {
-        const res = await axios.get(`https://device-darsan.mol.net.ua/device/${this.switch}/port/${port}/status`)
+        const res = await axios.get(`https://device-darsan.mak.htel.cc/device/${this.switch}/port/${port}/status`)
         stat = !res.data.status
         if (this.portStatus(port - 1) === 'port-trunk') {
           toast.info('Нельзя выключать транковый порт!', { timeout: 3000 })
         } else {
-          const resp = await axios.patch(`https://device-darsan.mol.net.ua/device/${this.switch}/port/${port}/status`, { status: stat })
+          const resp = await axios.patch(`https://device-darsan.mak.htel.cc/device/${this.switch}/port/${port}/status`, { status: stat })
           if (resp.data.status === stat) {
             toast.info(`Порт ${port} ${stat ? 'включен' : 'выключен'}`, { timeout: 3000 })
           }
@@ -207,7 +207,7 @@ export default {
         windowHeader: window.document.getElementById(this.windowId + '-' + 'header')
       }
     },
-    dragElement (elmnt) {
+    dragElement () {
       const context = this
       let pos1 = 0
       let pos2 = 0
@@ -311,7 +311,7 @@ export default {
   // },
   created: async function () {
     try {
-      const resp = await axios.get(`https://device-darsan.mol.net.ua/${this.isPon ? 'pon' : 'switch'}/${this.switch}`)
+      const resp = await axios.get(`https://device-darsan.mak.htel.cc/${this.isPon ? 'pon' : 'switch'}/${this.switch}`)
       this.data = resp.data
       // console.log(resp.data)
     } catch (err) {

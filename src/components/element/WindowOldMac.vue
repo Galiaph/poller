@@ -37,7 +37,7 @@
                           <img :src="'/images/site/st_' + userState(item) + '.png'" :title="item.connection_type">
                         </td>
                         <td class="login">
-                          <a class="show-hidden" :href="'https://radix.mol.net.ua/client/' + item.uid" v-if="item.uid" target="_blank">{{  item.login }}</a>
+                          <a class="show-hidden" :href="'https://radix.mak.htel.cc/client/' + item.uid" v-if="item.uid" target="_blank">{{  item.login }}</a>
                         </td>
                         <td class="mac">
                           {{ item.mac }}
@@ -110,7 +110,7 @@ export default {
       users: [],
       fdbCount: 0,
       usersCount: 0,
-      site: 'mol.net.ua'
+      site: 'mak.htel.cc'
     }
   },
   methods: {
@@ -137,7 +137,7 @@ export default {
         windowHeader: window.document.getElementById(this.windowId + '-' + 'header')
       }
     },
-    dragElement (elmnt) {
+    dragElement () {
       const context = this
       let pos1 = 0
       let pos2 = 0
@@ -241,7 +241,7 @@ export default {
   // },
   created: async function () {
     try {
-      const resp = await axios.get(`https://device-darsan.mol.net.ua/switch/${this.switch}/port/${this.port}/oldmacs`)
+      const resp = await axios.get(`https://device-darsan.mak.htel.cc/switch/${this.switch}/port/${this.port}/oldmacs`)
       this.fdb = resp.data
       const macs = []
       this.fdb.forEach(element => {

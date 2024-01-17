@@ -43,7 +43,7 @@ export default createStore({
       formData.append('login', user.username)
       formData.append('password', user.password)
       const resp = await axios.post(
-        'https://darsan.mol.net.ua/token',
+        'https://darsan.mak.htel.cc/token',
         formData
       )
       const token = resp.data.token
